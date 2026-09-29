@@ -1,0 +1,10 @@
+// App configuration - edit these two values when deploying.
+window.APP_CONFIG = {
+  // Base URL of the .NET API. '' means "same origin" (local full-stack run).
+  // Production example: 'https://pc-store-api.up.railway.app'
+  API_BASE_URL: '',
+
+  // Google OAuth Web Client ID (from Google Cloud Console).
+  // The SAME value must be set as Google:ClientId in the backend appsettings.
+  GOOGLE_CLIENT_ID: ''
+};

@@ -12,7 +12,7 @@
 <nav class="navbar">
 <div class="nav-container">
 <div class="nav-logo">
-<i class="fas fa-microchip"></i>
+<img src="logo/logo.png" alt="KONGKUN" class="nav-logo-img">
 <span>PC Parts Store</span>
 </div>
 <ul class="nav-links">
@@ -20,10 +20,11 @@
 <li><a href="#products">Sản phẩm</a></li>
 <li><a href="#about">Giới thiệu</a></li>
 <li><a href="#contact">Liên hệ</a></li>
+<li><a href="admin.html"><i class="fas fa-gear"></i> Quản trị</a></li>
 </ul>
-<button class="cart-btn" onclick="alert('Giỏ hàng: 0 sản phẩm')">
+<button class="cart-btn" onclick="openCart()">
 <i class="fas fa-shopping-cart"></i>
-<span class="cart-count">0</span>
+<span class="cart-count" id="cartCount">0</span>
 </button>
 </div>
 </nav>
@@ -44,6 +45,10 @@
 <div class="container">
 <div class="section-header">
 <h2><i class="fas fa-list"></i> Danh Sách Sản Phẩm</h2>
+<div class="search-row">
+<i class="fas fa-search"></i>
+<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm (tên, mô tả...)" oninput="onSearch(this.value)">
+</div>
 <div class="filters">
 <button class="filter-btn active" onclick="filterProducts('all')">Tất cả</button>
 <button class="filter-btn" onclick="filterProducts('cpu')">CPU</button>
@@ -100,35 +105,46 @@
 </div>
 <div class="footer-bottom">
 <p>&copy; 2026 PC Parts Store. All Rights Reserved.</p>
+<p class="author-line">Developed by <b>kongkun</b></p>
 </div>
 </div>
 </footer>
 
-<script>
-const products = [
-{id:1,name:"AMD Ryzen 9 7950X",category:"cpu",price:15990000,rating:4.8,image:"fa-microchip",desc:"CPU 16 lõi, 32 luồng, hiệu năng vượt trội cho gaming và multitasking"},
-{id:2,name:"Intel Core i9-14900K",category:"cpu",price:18990000,rating:4.7,image:"fa-microchip",desc:"CPU 24 lõi, 32 luồng, xung nhịp lên đến 6.0GHz"},
-{id:3,name:"AMD Ryzen 7 7800X3D",category:"cpu",price:11990000,rating:4.9,image:"fa-microchip",desc:"CPU 8 lõi với 3D V-Cache, tối ưu cho gaming"},
-{id:4,name:"NVIDIA RTX 4090",category:"gpu",price:49990000,rating:4.9,image:"fa-display",desc:"GPU hàng đầu, 24GB GDDR6X, ray tracing toàn diện"},
-{id:5,name:"NVIDIA RTX 4070 Ti Super",category:"gpu",price:15990000,rating:4.8,image:"fa-display",desc:"16GB GDDR6X, ray tracing thế hệ mới"},
-{id:6,name:"AMD Radeon RX 7900 XTX",category:"gpu",price:21990000,rating:4.7,image:"fa-display",desc:"24GB GDDR6, hiệu năng tối đa cho 4K gaming"},
-{id:7,name:"Corsair Vengeance DDR5 32GB",category:"ram",price:3290000,rating:4.6,image:"fa-memory",desc:"DDR5 6000MHz, CL30, bộ nhớ 32GB (2x16GB)"},
-{id:8,name:"G.Skill Trident Z5 64GB",category:"ram",price:5990000,rating:4.8,image:"fa-memory",desc:"DDR5 6400MHz, RGB, 64GB (2x32GB)"},
-{id:9,name:"Samsung 990 Pro 2TB",category:"storage",price:4290000,rating:4.9,image:"fa-hdd",desc:"SSD NVMe PCIe 4.0, tốc độ đọc lên đến 7450MB/s"},
-{id:10,name:"WD Black SN850X 4TB",category:"storage",price:7990000,rating:4.7,image:"fa-hdd",desc:"SSD NVMe PCIe 4.0, 4TB, tốc độ đọc 7300MB/s"},
-{id:11,name:"Crucial MX500 1TB",category:"storage",price:1590000,rating:4.5,image:"fa-hdd",desc:"SSD SATA 550MB/s, 1TB, bền bỉ và đáng tin cậy"},
-{id:12,name:"Seagate Barracuda 4TB HDD",category:"storage",price:2190000,rating:4.4,image:"fa-hdd",desc:"Ổ cứng HDD 4TB, 7200RPM, lưu trữ dữ liệu lớn"},
-{id:13,name:"Corsair RM1000x",category:"psu",price:3490000,rating:4.8,image:"fa-plug",desc:"Nguồn 1000W, 80 PLUS Gold, mô-đun hoàn toàn"},
-{id:14,name:"EVGA SuperNOVA 850W",category:"psu",price:2490000,rating:4.7,image:"fa-plug",desc:"Nguồn 850W, 80 PLUS Gold, bảo hành 10 năm"},
-{id:15,name:"Seasonic Focus GX-750",category:"psu",price:1990000,rating:4.6,image:"fa-plug",desc:"Nguồn 750W, 80 PLUS Gold, êm ái"},
-{id:16,name:"ASUS ROG Strix B650E-E",category:"mb",price:5990000,rating:4.8,image:"fa-desktop",desc:"Mainboard AM5, DDR5, WiFi 6E, PCIe 5.0"},
-{id:17,name:"MSI Z790 ACE",category:"mb",price:7990000,rating:4.7,image:"fa-desktop",desc:"Mainboard LGA1700, DDR5, PCIe 5.0, WiFi 6E"},
-{id:18,name:"Gigabyte B650 AORUS Elite",category:"mb",price:4290000,rating:4.6,image:"fa-desktop",desc:"Mainboard AM5, DDR5, PCIe 5.0, giá tốt"}
-];
+<!-- Cart drawer -->
+<div id="cartOverlay" class="cart-overlay" onclick="closeCart()"></div>
+<aside id="cartDrawer" class="cart-drawer">
+<div class="cart-head">
+<h3><i class="fas fa-shopping-cart"></i> Giỏ hàng</h3>
+<button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+</div>
+<div id="cartItems" class="cart-items"></div>
+<div class="cart-foot">
+<div class="cart-total"><span>Tổng cộng:</span><b id="cartTotal">0 VNĐ</b></div>
+<button class="cta-btn cart-checkout" onclick="checkout()">Thanh toán</button>
+</div>
+</aside>
 
-function renderProducts(filter = 'all') {
+<script src="config.js"></script>
+<script src="products.js"></script>
+<script>
+var products = loadProducts();
+
+var products = [];
+var currentFilter = 'all';
+var currentQuery = '';
+
+function renderProducts() {
 const grid = document.getElementById('productsGrid');
-const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+const q = currentQuery.toLowerCase();
+const filtered = products.filter(function (p) {
+const okCat = (currentFilter === 'all' || p.category === currentFilter);
+const okQ = (!q || (p.name || '').toLowerCase().indexOf(q) !== -1 || (p.desc || '').toLowerCase().indexOf(q) !== -1);
+return okCat && okQ;
+});
+if (!filtered.length) {
+grid.innerHTML = '<p class="empty-msg">Không tìm thấy sản phẩm nào phù hợp.</p>';
+return;
+}
 grid.innerHTML = filtered.map(p => `
 <div class="product-card" data-category="${p.category}">
 <div class="product-image">
@@ -151,23 +167,117 @@ ${'<i class="fas fa-star"></i>'.repeat(Math.floor(p.rating))}${'<i class="fas fa
 `).join('');
 }
 
-function getCategoryName(cat) {
-const names = {cpu:'CPU',gpu:'GPU',ram:'RAM',storage:'Lưu trữ',psu:'Nguồn',mb:'Mainboard'};
-return names[cat] || cat;
-}
-
 function filterProducts(cat) {
 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
 event.target.classList.add('active');
-renderProducts(cat);
+currentFilter = cat;
+renderProducts();
+}
+
+function onSearch(val) {
+currentQuery = val.trim();
+renderProducts();
+}
+
+// ---------- Shopping cart (per-user, stored in this browser) ----------
+var CART_KEY = 'pc_parts_cart_v1';
+
+function getCart() {
+try {
+const raw = localStorage.getItem(CART_KEY);
+const parsed = raw ? JSON.parse(raw) : [];
+return Array.isArray(parsed) ? parsed : [];
+} catch (e) { return []; }
+}
+
+function saveCart(cart) {
+localStorage.setItem(CART_KEY, JSON.stringify(cart));
+updateCartCount();
+}
+
+function updateCartCount() {
+const n = getCart().reduce((s, i) => s + i.qty, 0);
+document.getElementById('cartCount').textContent = n;
 }
 
 function addToCart(id) {
 const p = products.find(pr => pr.id === id);
-alert(`Đã thêm "${p.name}" vào giỏ hàng!`);
+if (!p) return;
+const cart = getCart();
+const line = cart.find(i => i.id === id);
+if (line) line.qty += 1;
+else cart.push({id: p.id, name: p.name, price: p.price, qty: 1});
+saveCart(cart);
+renderCart();
+openCart();
 }
 
+function changeQty(id, delta) {
+const cart = getCart();
+const line = cart.find(i => i.id === id);
+if (!line) return;
+line.qty += delta;
+if (line.qty <= 0) cart.splice(cart.indexOf(line), 1);
+saveCart(cart);
+renderCart();
+}
+
+function removeFromCart(id) {
+saveCart(getCart().filter(i => i.id !== id));
+renderCart();
+}
+
+function cartTotal() {
+return getCart().reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+function renderCart() {
+const box = document.getElementById('cartItems');
+const cart = getCart();
+if (!cart.length) {
+box.innerHTML = '<p class="empty-msg">Giỏ hàng đang trống.</p>';
+} else {
+box.innerHTML = cart.map(i => `
+<div class="cart-line">
+<div class="cart-line-info"><b>${i.name}</b><span>${i.price.toLocaleString()} VNĐ</span></div>
+<div class="cart-line-ctl">
+<button onclick="changeQty(${i.id},-1)">−</button>
+<span>${i.qty}</span>
+<button onclick="changeQty(${i.id},1)">+</button>
+<button class="cart-remove" onclick="removeFromCart(${i.id})"><i class="fas fa-trash"></i></button>
+</div>
+</div>`).join('');
+}
+document.getElementById('cartTotal').textContent = cartTotal().toLocaleString() + ' VNĐ';
+}
+
+function openCart() {
+document.getElementById('cartDrawer').classList.add('open');
+document.getElementById('cartOverlay').classList.add('show');
+renderCart();
+}
+
+function closeCart() {
+document.getElementById('cartDrawer').classList.remove('open');
+document.getElementById('cartOverlay').classList.remove('show');
+}
+
+function checkout() {
+const cart = getCart();
+if (!cart.length) { alert('Giỏ hàng đang trống!'); return; }
+alert(`Đặt hàng thành công! Tổng: ${cartTotal().toLocaleString()} VNĐ\nCảm ơn bạn đã mua sắm tại PC Parts Store.`);
+saveCart([]);
+renderCart();
+closeCart();
+}
+
+// Load catalog from the .NET API when reachable, else local defaults.
+loadProductsAsync().then(function (list) {
+products = list;
 renderProducts();
+updateCartCount();
+renderCart();
+});
 </script>
 </body>
 </html>

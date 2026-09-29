@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản Trị - PC Parts Store</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<!-- Login gate -->
+<div id="loginGate" class="login-gate">
+<div class="login-box">
+<img src="logo/logo.png" alt="KONGKUN" class="login-logo">
+<h2>Đăng Nhập Quản Trị</h2>
+<p id="loginHint">Đăng nhập bằng Gmail admin để quản lý sản phẩm</p>
+<div id="googleBtnWrap" class="google-btn-wrap"><div id="googleBtn"></div></div>
+<div id="devLogin" style="display:none">
+<p>Chế độ dev (chưa cấu hình Google Client ID)</p>
+<input type="password" id="adminPass" placeholder="Mật khẩu (mặc định: admin123)" onkeydown="if(event.key==='Enter')doDevLogin()">
+<button onclick="doDevLogin()"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+</div>
+<p id="loginError" class="login-error"></p>
+<a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Về trang chủ</a>
+</div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="admin-wrap" style="display:none">
+<nav class="navbar">
+<div class="nav-container">
+<div class="nav-logo">
+<img src="logo/logo.png" alt="KONGKUN" class="nav-logo-img">
+<span>Admin Panel</span>
+</div>
+<ul class="nav-links">
+<li><a href="index.html"><i class="fas fa-store"></i> Xem cửa hàng</a></li>
+<li><span id="userChip" class="user-chip"></span></li>
+<li><a href="#" onclick="doLogout();return false"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+</ul>
+</div>
+</nav>
+
+<div class="container admin-content">
+<h1 class="admin-title"><i class="fas fa-gauge-high"></i> Dashboard Quản Lý Sản Phẩm</h1>
+<p id="modeBadge" class="mode-badge"></p>
+
+<div class="stat-cards">
+<div class="stat-card"><i class="fas fa-boxes-stacked"></i><div><h3 id="statTotal">0</h3><p>Tổng sản phẩm</p></div></div>
+<div class="stat-card"><i class="fas fa-sack-dollar"></i><div><h3 id="statValue">0</h3><p>Tổng giá trị kho</p></div></div>
+<div class="stat-card"><i class="fas fa-layer-group"></i><div><h3 id="statCats">0</h3><p>Danh mục</p></div></div>
+<div class="stat-card"><i class="fas fa-star"></i><div><h3 id="statRating">0</h3><p>Đánh giá TB</p></div></div>
+</div>
+
+<div class="admin-toolbar">
+<div class="toolbar-left">
+<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm..." oninput="refreshTable()">
+<select id="catFilter" onchange="refreshTable()">
+<option value="all">Tất cả danh mục</option>
+<option value="cpu">CPU</option>
+<option value="gpu">GPU</option>
+<option value="ram">RAM</option>
+<option value="storage">Lưu trữ</option>
+<option value="psu">Nguồn</option>
+<option value="mb">Mainboard</option>
+</select>
+</div>
+<div class="toolbar-right">
+<button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Thêm sản phẩm</button>
+<button class="btn btn-ghost" onclick="resetData()"><i class="fas fa-rotate-left"></i> Khôi phục mặc định</button>
+<button class="btn btn-ghost" onclick="location.reload()"><i class="fas fa-rotate"></i> Tải lại</button>
+</div>
+</div>
+
+<div class="table-wrap">
+<table class="admin-table">
+<thead>
+<tr><th>ID</th><th>Tên sản phẩm</th><th>Danh mục</th><th>Giá (VNĐ)</th><th>Đánh giá</th><th>Thao tác</th></tr>
+</thead>
+<tbody id="productTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- Add/Edit modal -->
+<div id="productModal" class="modal" style="display:none">
+<div class="modal-box">
+<h2 id="modalTitle"><i class="fas fa-plus"></i> Thêm sản phẩm</h2>
+<input type="hidden" id="fId">
+<label>Tên sản phẩm *</label>
+<input type="text" id="fName" placeholder="VD: AMD Ryzen 5 7600X">
+<label>Danh mục *</label>
+<select id="fCategory">
+<option value="cpu">CPU</option>
+<option value="gpu">GPU</option>
+<option value="ram">RAM</option>
+<option value="storage">Lưu trữ</option>
+<option value="psu">Nguồn</option>
+<option value="mb">Mainboard</option>
+</select>
+<label>Giá (VNĐ) *</label>
+<input type="number" id="fPrice" min="0" step="1000" placeholder="VD: 5990000">
+<label>Đánh giá (0 - 5)</label>
+<input type="number" id="fRating" min="0" max="5" step="0.1" placeholder="VD: 4.7">
+<label>Mô tả</label>
+<textarea id="fDesc" rows="3" placeholder="Mô tả ngắn về sản phẩm..."></textarea>
+<p id="formError" class="login-error"></p>
+<div class="modal-actions">
+<button class="btn btn-ghost" onclick="closeModal()">Hủy</button>
+<button class="btn btn-primary" onclick="saveProduct()"><i class="fas fa-save"></i> Lưu</button>
+</div>
+</div>
+</div>
+
+<script src="config.js"></script>
+<script src="products.js"></script>
+<script>
+// session = { mode:'api'|'local', idToken, email, name, picture }
+var session = null;
+var cachedProducts = [];
+
+function googleClientId() {
+  return (window.APP_CONFIG && APP_CONFIG.GOOGLE_CLIENT_ID) || '';
+}
+
+// ---------- Login ----------
+function initLogin() {
+  try {
+    var saved = sessionStorage.getItem('pc_parts_admin_session');
+    if (saved) {
+      var s = JSON.parse(saved);
+      if (s && s.email) {
+        if (s.mode === 'api' && s.idToken) return verifyWithApi(s.idToken);
+        if (s.mode === 'local') { session = s; return showDashboard(); }
+      }
+    }
+  } catch (e) {}
+  if (!googleClientId()) {
+    document.getElementById('loginHint').textContent = 'Chưa cấu hình Google Client ID — dùng mật khẩu dev để test giao diện.';
+    document.getElementById('devLogin').style.display = 'block';
+    return;
+  }
+  waitForGIS(function () {
+    google.accounts.id.initialize({
+      client_id: googleClientId(),
+      callback: onGoogleCredential
+    });
+    google.accounts.id.renderButton(document.getElementById('googleBtn'), {
+      theme: 'filled_black', size: 'large', width: 320,
+      text: 'signin_with', logo_alignment: 'center'
+    });
+  });
+}
+
+function waitForGIS(cb) {
+  if (window.google && google.accounts && google.accounts.id) return cb();
+  var tries = 0;
+  var t = setInterval(function () {
+    tries++;
+    if (window.google && google.accounts && google.accounts.id) { clearInterval(t); cb(); }
+    else if (tries > 50) { clearInterval(t); loginFail('Không tải được Google Sign-In. Kiểm tra mạng.'); }
+  }, 200);
+}
+
+function onGoogleCredential(resp) {
+  googleLoginApi(resp.credential).then(function (me) {
+    if (!me.isAdmin) { loginFail('Gmail ' + me.email + ' không có quyền admin!'); return; }
+    session = { mode: 'api', idToken: resp.credential, email: me.email, name: me.name, picture: me.picture };
+    persistSession();
+    showDashboard();
+  }).catch(function (err) {
+    loginFail('Đăng nhập thất bại: ' + err.message + ' (API có đang chạy? Client ID đã khớp backend?)');
+  });
+}
+
+function verifyWithApi(idToken) {
+  googleLoginApi(idToken).then(function (me) {
+    if (!me.isAdmin) { doLogout(); return; }
+    session = { mode: 'api', idToken: idToken, email: me.email, name: me.name, picture: me.picture };
+    persistSession();
+    showDashboard();
+  }).catch(function () { doLogout(); });
+}
+
+function doDevLogin() {
+  var pass = localStorage.getItem('pc_parts_admin_pass') || 'admin123';
+  if (document.getElementById('adminPass').value === pass) {
+    session = { mode: 'local', email: 'dev@localhost', name: 'Dev Admin', picture: '' };
+    persistSession();
+    showDashboard();
+  } else {
+    loginFail('Mật khẩu không đúng, thử lại!');
+  }
+}
+
+function loginFail(msg) {
+  document.getElementById('loginError').textContent = msg;
+}
+
+function persistSession() {
+  try { sessionStorage.setItem('pc_parts_admin_session', JSON.stringify(session)); } catch (e) {}
+}
+
+function doLogout() {
+  sessionStorage.removeItem('pc_parts_admin_session');
+  location.reload();
+}
+
+// ---------- Dashboard ----------
+function showDashboard() {
+  document.getElementById('loginGate').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  var chip = document.getElementById('userChip');
+  chip.innerHTML = (session.picture ? '<img src="' + session.picture + '" alt="">' : '<i class="fas fa-user"></i>') +
+    '<span>' + escapeHtml(session.email) + '</span>';
+  var badge = document.getElementById('modeBadge');
+  badge.textContent = session.mode === 'api'
+    ? '● Đang kết nối API .NET — mọi thay đổi đồng bộ cho tất cả mọi người'
+    : '● Chế độ local (dev) — thay đổi chỉ lưu trên trình duyệt này';
+  badge.className = 'mode-badge ' + session.mode;
+  refreshTable();
+}
+
+function money(n) { return Number(n).toLocaleString('vi-VN'); }
+
+function fetchList() {
+  if (session.mode === 'api') return apiRequest('GET', '/api/products', undefined, session.idToken);
+  return Promise.resolve(loadProducts());
+}
+
+function refreshTable() {
+  fetchList().then(function (list) {
+    cachedProducts = list;
+    renderStats(list);
+    renderRows(list);
+  }).catch(function (err) {
+    document.getElementById('productTableBody').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:30px;color:#ff5c5c">Lỗi tải dữ liệu: ' +
+      escapeHtml(err.message) + '</td></tr>';
+  });
+}
+
+function renderStats(products) {
+  var total = products.length;
+  var value = products.reduce(function (s, p) { return s + Number(p.price || 0); }, 0);
+  var cats = {};
+  products.forEach(function (p) { cats[p.category] = 1; });
+  var avg = total ? (products.reduce(function (s, p) { return s + Number(p.rating || 0); }, 0) / total) : 0;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statValue').textContent = money(value) + ' đ';
+  document.getElementById('statCats').textContent = Object.keys(cats).length;
+  document.getElementById('statRating').textContent = avg.toFixed(1);
+}
+
+function renderRows(products) {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var cat = document.getElementById('catFilter').value;
+  var rows = products.filter(function (p) {
+    var okCat = (cat === 'all' || p.category === cat);
+    var okQ = (!q || (p.name || '').toLowerCase().indexOf(q) !== -1);
+    return okCat && okQ;
+  });
+  document.getElementById('productTableBody').innerHTML = rows.map(function (p) {
+    return '<tr>' +
+      '<td>#' + p.id + '</td>' +
+      '<td><b>' + escapeHtml(p.name) + '</b><br><small>' + escapeHtml(p.desc || '') + '</small></td>' +
+      '<td><span class="product-category">' + getCategoryName(p.category) + '</span></td>' +
+      '<td class="price-cell">' + money(p.price) + '</td>' +
+      '<td><i class="fas fa-star" style="color:#f5a623"></i> ' + p.rating + '</td>' +
+      '<td class="actions-cell">' +
+        '<button class="btn btn-small" onclick="openModal(' + p.id + ')"><i class="fas fa-pen"></i> Sửa</button> ' +
+        '<button class="btn btn-small btn-danger" onclick="deleteProduct(' + p.id + ')"><i class="fas fa-trash"></i> Xóa</button>' +
+      '</td></tr>';
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:30px;color:#666">Không có sản phẩm nào</td></tr>';
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ---------- Create / Update / Delete ----------
+function openModal(id) {
+  document.getElementById('formError').textContent = '';
+  if (id == null) {
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Thêm sản phẩm mới';
+    document.getElementById('fId').value = '';
+    document.getElementById('fName').value = '';
+    document.getElementById('fCategory').value = 'cpu';
+    document.getElementById('fPrice').value = '';
+    document.getElementById('fRating').value = '4.5';
+    document.getElementById('fDesc').value = '';
+  } else {
+    var p = cachedProducts.find(function (x) { return x.id === id; });
+    if (!p) return;
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen"></i> Sửa sản phẩm #' + p.id;
+    document.getElementById('fId').value = p.id;
+    document.getElementById('fName').value = p.name;
+    document.getElementById('fCategory').value = p.category;
+    document.getElementById('fPrice').value = p.price;
+    document.getElementById('fRating').value = p.rating;
+    document.getElementById('fDesc').value = p.desc || '';
+  }
+  document.getElementById('productModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('productModal').style.display = 'none';
+}
+
+function readForm() {
+  var err = document.getElementById('formError');
+  var name = document.getElementById('fName').value.trim();
+  var category = document.getElementById('fCategory').value;
+  var price = Number(document.getElementById('fPrice').value);
+  var rating = Number(document.getElementById('fRating').value);
+  var desc = document.getElementById('fDesc').value.trim();
+  if (!name) { err.textContent = 'Vui lòng nhập tên sản phẩm!'; return null; }
+  if (!(price >= 0)) { err.textContent = 'Giá phải là số không âm!'; return null; }
+  if (!(rating >= 0 && rating <= 5)) { err.textContent = 'Đánh giá phải từ 0 đến 5!'; return null; }
+  return { name: name, category: category, price: price, rating: rating, image: CATEGORY_ICONS[category] || 'fa-box', desc: desc };
+}
+
+function saveProduct() {
+  var data = readForm();
+  if (!data) return;
+  var idVal = document.getElementById('fId').value;
+  var done = function () { closeModal(); refreshTable(); };
+  var fail = function (err) { document.getElementById('formError').textContent = 'Lỗi lưu: ' + err.message; };
+  if (session.mode === 'api') {
+    if (idVal === '') apiRequest('POST', '/api/products', data, session.idToken).then(done, fail);
+    else apiRequest('PUT', '/api/products/' + idVal, data, session.idToken).then(done, fail);
+  } else {
+    var products = loadProducts();
+    if (idVal === '') {
+      data.id = nextProductId(products);
+      products.push(data);
+    } else {
+      var p = products.find(function (x) { return x.id === Number(idVal); });
+      if (!p) { fail(new Error('Không tìm thấy sản phẩm!')); return; }
+      Object.assign(p, data);
+    }
+    saveProducts(products);
+    done();
+  }
+}
+
+function deleteProduct(id) {
+  var p = cachedProducts.find(function (x) { return x.id === id; });
+  if (!p) return;
+  if (!confirm('Xóa sản phẩm "' + p.name + '"?')) return;
+  if (session.mode === 'api') {
+    apiRequest('DELETE', '/api/products/' + id, undefined, session.idToken).then(refreshTable, function (err) {
+      alert('Xóa thất bại: ' + err.message);
+    });
+  } else {
+    saveProducts(loadProducts().filter(function (x) { return x.id !== id; }));
+    refreshTable();
+  }
+}
+
+function resetData() {
+  if (!confirm('Khôi phục toàn bộ về 18 sản phẩm mặc định? Mọi thay đổi sẽ mất!')) return;
+  if (session.mode === 'api') {
+    // Delete all, then re-seed defaults through the API.
+    var chain = fetchList().then(function (list) {
+      var seq = Promise.resolve();
+      list.forEach(function (p) {
+        seq = seq.then(function () { return apiRequest('DELETE', '/api/products/' + p.id, undefined, session.idToken); });
+      });
+      return seq;
+    }).then(function () {
+      var seq = Promise.resolve();
+      DEFAULT_PRODUCTS.forEach(function (d) {
+        var copy = { name: d.name, category: d.category, price: d.price, rating: d.rating, image: d.image, desc: d.desc };
+        seq = seq.then(function () { return apiRequest('POST', '/api/products', copy, session.idToken); });
+      });
+      return seq;
+    });
+    chain.then(refreshTable, function (err) { alert('Khôi phục thất bại: ' + err.message); });
+  } else {
+    resetProducts();
+    refreshTable();
+  }
+}
+
+initLogin();
+</script>
+</body>
+</html>
