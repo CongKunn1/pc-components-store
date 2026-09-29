@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# pc-components-store API image
 WORKDIR /app
 EXPOSE 8080
 # Railway injects $PORT; fall back to 8080 for local docker runs.
