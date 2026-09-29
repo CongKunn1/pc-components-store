@@ -6,5 +6,5 @@ window.APP_CONFIG = {
 
   // Google OAuth Web Client ID (from Google Cloud Console).
   // The SAME value must be set as Google:ClientId in the backend appsettings.
-  GOOGLE_CLIENT_ID: ''
+  GOOGLE_CLIENT_ID: '811603432729-i57s08d380v71mdjh1ulc023i4klnqf0.apps.googleusercontent.com'
 };
