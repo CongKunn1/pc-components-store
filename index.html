@@ -43,6 +43,7 @@
 <section id="products" class="products">
 <div class="container">
 <div class="section-header">
+<nav class="crumb"><a href="#home">Trang chủ</a> <span>/</span> <b id="crumbName">Linh kiện máy tính</b></nav>
 <h2><i class="fas fa-list"></i> Danh Sách Sản Phẩm</h2>
 <p id="groupSub" class="group-sub"></p>
 <div class="cat-menu-wrap">
@@ -70,46 +71,9 @@
 </div>
 <div class="search-row">
 <i class="fas fa-search"></i>
-<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm (tên, mô tả...)" oninput="onSearch(this.value)">
+<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm (tên, hãng, danh mục...)" oninput="onSearch(this.value)">
 </div>
-<div class="filters" id="compFilters">
-<button class="filter-btn active" data-cat="all" onclick="filterProducts('all')">Tất cả</button>
-<button class="filter-btn" data-cat="cpu" onclick="filterProducts('cpu')">CPU</button>
-<button class="filter-btn" data-cat="gpu" onclick="filterProducts('gpu')">GPU</button>
-<button class="filter-btn" data-cat="ram" onclick="filterProducts('ram')">RAM</button>
-<button class="filter-btn" data-cat="storage" onclick="filterProducts('storage')">Lưu Trữ</button>
-<button class="filter-btn" data-cat="psu" onclick="filterProducts('psu')">Nguồn</button>
-<button class="filter-btn" data-cat="mb" onclick="filterProducts('mb')">Mainboard</button>
-</div>
-<div class="spec-filters" id="monFilters" style="display:none">
-<div class="price-filter">
-<div class="price-label"><i class="fas fa-tag"></i> Khoảng giá: <b id="monPriceLabel">0 – 200 triệu</b></div>
-<div class="range-wrap">
-<input type="range" id="monMin" min="0" max="200000000" step="1000000" value="0" oninput="onPriceInput('monitor')">
-<input type="range" id="monMax" min="0" max="200000000" step="1000000" value="200000000" oninput="onPriceInput('monitor')">
-</div>
-</div>
-<div class="spec-row">
-<label>Hãng <select id="monBrand" onchange="onSpecChange()"></select></label>
-<label>Độ phân giải <select id="monRes" onchange="onSpecChange()"></select></label>
-<label>Tần số quét <select id="monHz" onchange="onSpecChange()"></select></label>
-</div>
-<p class="filter-count" id="monCount"></p>
-</div>
-<div class="spec-filters" id="lapFilters" style="display:none">
-<div class="price-filter">
-<div class="price-label"><i class="fas fa-tag"></i> Khoảng giá: <b id="lapPriceLabel">0 – 200 triệu</b></div>
-<div class="range-wrap">
-<input type="range" id="lapMin" min="0" max="200000000" step="1000000" value="0" oninput="onPriceInput('laptop')">
-<input type="range" id="lapMax" min="0" max="200000000" step="1000000" value="200000000" oninput="onPriceInput('laptop')">
-</div>
-</div>
-<div class="spec-row">
-<label>Hãng <select id="lapBrand" onchange="onSpecChange()"></select></label>
-<label>RAM <select id="lapRam" onchange="onSpecChange()"></select></label>
-</div>
-<p class="filter-count" id="lapCount"></p>
-</div>
+<div class="filter-bar" id="filterBar"></div>
 </div>
 <div class="products-grid" id="productsGrid">
 </div>
@@ -181,11 +145,25 @@
 <script>
 var products = [];
 var currentGroup = 'components';
-var currentFilter = 'all';
 var currentQuery = '';
-var PRICE_MAX = 200000000;
-var monState = {min:0, max:PRICE_MAX, brand:'all', res:'all', hz:'all'};
-var lapState = {min:0, max:PRICE_MAX, brand:'all', ram:'all'};
+var openDrop = null;
+// Per-group filter state. Empty arrays = no restriction.
+var F = {
+  components: { cats: [], prices: [], stock: 'all', sort: 'default' },
+  monitor: { prices: [], brands: [], res: [], hz: [], panels: [], stock: 'all', sort: 'default' },
+  laptop: { prices: [], brands: [], ram: [], stock: 'all', sort: 'default' }
+};
+var STOCK_OPTS = [
+  { id: 'all', label: 'Tất cả' },
+  { id: 'in', label: 'Còn hàng' },
+  { id: 'out', label: 'Hết hàng' }
+];
+var SORT_OPTS = [
+  { id: 'default', label: 'Mặc định' },
+  { id: 'price-asc', label: 'Giá thấp đến cao' },
+  { id: 'price-desc', label: 'Giá cao đến thấp' },
+  { id: 'rating', label: 'Đánh giá cao nhất' }
+];
 
 function escapeAttr(s) {
 return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -199,6 +177,7 @@ html += '<img src="' + p.imageUrl + '" alt="' + escapeAttr(p.name) + '" loading=
 html += '<div class="product-icon-fallback"' + (p.imageUrl ? ' style="display:none"' : '') + '><i class="fas ' + (p.image || 'fa-box') + '"></i></div>';
 var pct = discountPct(p);
 if (pct > 0) html += '<span class="discount-badge">-' + pct + '%</span>';
+if (!inStock(p)) html += '<span class="stock-badge">Hết hàng</span>';
 html += '<div class="card-hover"><button onclick="addToCart(' + p.id + ')"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button></div>';
 return html;
 }
@@ -217,6 +196,7 @@ var parts = [];
 if (p.brand) parts.push(getBrandName(p.brand));
 if (p.resolution) parts.push(getResolutionName(p.resolution));
 if (p.refreshRate) parts.push(p.refreshRate + 'Hz');
+if (p.panel) parts.push(p.panel);
 if (p.ramGb) parts.push('RAM ' + p.ramGb + 'GB');
 if (!parts.length) return '';
 return '<div class="product-specs">' + parts.join(' • ') + '</div>';
@@ -234,7 +214,9 @@ specLine(p) +
 '<i class="fas fa-star"></i>'.repeat(Math.floor(p.rating)) + '<i class="fas fa-star-half-alt"></i>'.repeat(p.rating % 1 >= 0.5 ? 1 : 0) +
 '<span>' + p.rating + '</span></div>' +
 '<div class="product-footer">' + priceHtml(p) +
-'<button class="add-cart-btn" onclick="addToCart(' + p.id + ')">Thêm vào giỏ</button>' +
+(inStock(p)
+? '<button class="add-cart-btn" onclick="addToCart(' + p.id + ')">Thêm vào giỏ</button>'
+: '<button class="add-cart-btn" disabled>Hết hàng</button>') +
 '</div></div></div>';
 }
 
@@ -253,41 +235,41 @@ return price >= st.min && price <= st.max;
 
 function applyFilters() {
 // Global search: query searches ALL groups, ignoring group + spec filters.
-if (currentQuery) return products.filter(matchQuery);
-return products.filter(function (p) {
+if (currentQuery) return sortList(products.filter(matchQuery), F[currentGroup].sort);
+var st = F[currentGroup];
+var list = products.filter(function (p) {
 if (GROUPS[currentGroup].cats.indexOf(p.category) === -1) return false;
-if (!matchQuery(p)) return false;
-if (currentGroup === 'components') {
-return currentFilter === 'all' || p.category === currentFilter;
-}
+if (currentGroup === 'components' && st.cats.length && st.cats.indexOf(p.category) === -1) return false;
+if (!matchBracket(p, st.prices)) return false;
+if ((currentGroup === 'monitor' || currentGroup === 'laptop') && !matchMulti(p, 'brand', st.brands)) return false;
 if (currentGroup === 'monitor') {
-if (!inPrice(p, monState)) return false;
-if (monState.brand !== 'all' && String(p.brand || '').toLowerCase() !== monState.brand) return false;
-if (monState.res !== 'all' && String(p.resolution || '') !== monState.res) return false;
-if (monState.hz !== 'all' && String(p.refreshRate || '') !== monState.hz) return false;
-return true;
+if (!matchMulti(p, 'resolution', st.res)) return false;
+if (st.hz.length && st.hz.indexOf(String(p.refreshRate == null ? '' : p.refreshRate)) === -1) return false;
+if (!matchMulti(p, 'panel', st.panels)) return false;
 }
-if (currentGroup === 'laptop') {
-if (!inPrice(p, lapState)) return false;
-if (lapState.brand !== 'all' && String(p.brand || '').toLowerCase() !== lapState.brand) return false;
-if (lapState.ram !== 'all' && String(p.ramGb || '') !== lapState.ram) return false;
-return true;
-}
+if (currentGroup === 'laptop' && st.ram.length && st.ram.indexOf(String(p.ramGb == null ? '' : p.ramGb)) === -1) return false;
+if (st.stock === 'in' && !inStock(p)) return false;
+if (st.stock === 'out' && inStock(p)) return false;
 return true;
 });
+return sortList(list, st.sort);
+}
+
+function sortList(list, mode) {
+var a = list.slice();
+if (mode === 'price-asc') a.sort(function (x, y) { return effPrice(x) - effPrice(y); });
+else if (mode === 'price-desc') a.sort(function (x, y) { return effPrice(y) - effPrice(x); });
+else if (mode === 'rating') a.sort(function (x, y) { return (y.rating || 0) - (x.rating || 0); });
+return a;
 }
 
 function renderProducts() {
-buildSpecOptions();
-syncPriceLabels();
+buildFilterBar();
 var searching = !!currentQuery;
-document.getElementById('compFilters').style.display = (!searching && currentGroup === 'components') ? '' : 'none';
-document.getElementById('monFilters').style.display = (!searching && currentGroup === 'monitor') ? '' : 'none';
-document.getElementById('lapFilters').style.display = (!searching && currentGroup === 'laptop') ? '' : 'none';
 var list = applyFilters();
 var grid = document.getElementById('productsGrid');
 if (!list.length) {
-grid.innerHTML = '<p class="empty-msg">Không tìm thấy sản phẩm nào phù hợp. Thử từ khóa khác.</p>';
+grid.innerHTML = '<p class="empty-msg">Không tìm thấy sản phẩm nào phù hợp với tiêu chí lọc.</p>';
 } else {
 grid.innerHTML = list.map(productCard).join('');
 }
@@ -295,16 +277,8 @@ var sub = document.getElementById('groupSub');
 if (sub) sub.textContent = searching
 ? 'Kết quả tìm kiếm cho "' + currentQuery + '" • ' + list.length + ' sản phẩm'
 : GROUPS[currentGroup].name + ' • ' + list.length + ' sản phẩm';
-var mc = document.getElementById('monCount');
-if (mc && currentGroup === 'monitor') mc.textContent = 'Tìm thấy ' + list.length + ' sản phẩm';
-var lc = document.getElementById('lapCount');
-if (lc && currentGroup === 'laptop') lc.textContent = 'Tìm thấy ' + list.length + ' sản phẩm';
-}
-
-function filterProducts(cat) {
-document.querySelectorAll('#compFilters .filter-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-cat') === cat));
-currentFilter = cat;
-renderProducts();
+var crumb = document.getElementById('crumbName');
+if (crumb) crumb.textContent = searching ? 'Tìm kiếm' : GROUPS[currentGroup].name;
 }
 
 function onSearch(val) {
@@ -328,6 +302,7 @@ function closeMenus() {
 var m = document.getElementById('catMenu');
 if (m) m.classList.remove('show');
 document.querySelectorAll('.cat-item.open').forEach(function (x) { x.classList.remove('open'); });
+if (openDrop !== null) { openDrop = null; buildFilterBar(); }
 }
 document.addEventListener('click', function () {
 closeMenus();
@@ -335,7 +310,6 @@ closeMenus();
 
 function selectGroup(g) {
 currentGroup = g;
-currentFilter = 'all';
 closeMenus();
 syncGroupUI();
 renderProducts();
@@ -343,7 +317,7 @@ renderProducts();
 
 function selectSub(g, cat) {
 currentGroup = g;
-currentFilter = cat;
+F.components.cats = (cat === 'all') ? [] : [cat];
 closeMenus();
 syncGroupUI();
 renderProducts();
@@ -351,59 +325,108 @@ renderProducts();
 
 function syncGroupUI() {
 document.getElementById('catMenuBtnLabel').textContent = GROUPS[currentGroup].name;
-document.querySelectorAll('#compFilters .filter-btn').forEach(function (b) {
-b.classList.toggle('active', b.getAttribute('data-cat') === currentFilter);
-});
 }
 
-// ---------- Spec filters (monitor / laptop) ----------
-function fillSelect(id, values, labelFn, current) {
-var sel = document.getElementById(id);
-if (!sel) return;
-var html = '<option value="all">Tất cả</option>' + values.map(function (v) {
-var key = String(v);
-return '<option value="' + key + '"' + (key === String(current) ? ' selected' : '') + '>' + labelFn(v) + '</option>';
+// ---------- Filter bar (collection style) ----------
+function esc(s) {
+return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function checkRow(group, field, value, label, checked) {
+return '<label class="fcheck"><input type="checkbox" data-group="' + group + '" data-field="' + field + '" value="' + esc(value) + '"' +
+(checked ? ' checked' : '') + ' onchange="onCheck(this)"><span></span>' + esc(label) + '</label>';
+}
+
+function radioRow(group, field, opts, current) {
+return opts.map(function (o) {
+return '<label class="fcheck"><input type="radio" name="' + group + '-' + field + '" data-group="' + group + '" data-field="' + field + '" value="' + o.id + '"' +
+(o.id === current ? ' checked' : '') + ' onchange="onPick(this)"><span></span>' + esc(o.label) + '</label>';
 }).join('');
-if (sel.getAttribute('data-sig') !== html) {
-sel.innerHTML = html;
-sel.setAttribute('data-sig', html);
-}
 }
 
-function buildSpecOptions() {
-fillSelect('monBrand', distinctValues(products, 'monitor', 'brand'), getBrandName, monState.brand);
-fillSelect('monRes', distinctValues(products, 'monitor', 'resolution'), getResolutionName, monState.res);
-fillSelect('monHz', distinctValues(products, 'monitor', 'refreshRate'), function (v) { return v + 'Hz'; }, monState.hz);
-fillSelect('lapBrand', distinctValues(products, 'laptop', 'brand'), getBrandName, lapState.brand);
-fillSelect('lapRam', distinctValues(products, 'laptop', 'ramGb'), function (v) { return v + 'GB'; }, lapState.ram);
+function fdrop(id, title, inner, badge) {
+return '<div class="fdrop' + (openDrop === id ? ' open' : '') + '" id="fd-' + id + '">' +
+'<button class="fbtn" onclick="toggleDrop(event,\'' + id + '\')">' + esc(title) +
+(badge ? ' <span class="fbadge">' + badge + '</span>' : '') + ' <i class="fas fa-chevron-down"></i></button>' +
+'<div class="fpanel" onclick="event.stopPropagation()">' + inner + '</div></div>';
 }
 
-function onSpecChange() {
-monState.brand = document.getElementById('monBrand').value;
-monState.res = document.getElementById('monRes').value;
-monState.hz = document.getElementById('monHz').value;
-lapState.brand = document.getElementById('lapBrand').value;
-lapState.ram = document.getElementById('lapRam').value;
+function activeCount() {
+var st = F[currentGroup];
+var n = 0;
+['cats', 'prices', 'brands', 'res', 'hz', 'panels', 'ram'].forEach(function (k) {
+if (st[k] && st[k].length) n += st[k].length;
+});
+if (st.stock !== 'all') n += 1;
+return n;
+}
+
+function buildFilterBar() {
+var g = currentGroup, st = F[g];
+var brandVals = distinctValues(products, g, 'brand');
+var html = '<button class="fbtn fclear" onclick="clearAllFilters()"><i class="fas fa-filter"></i> Bộ lọc' +
+(activeCount() ? ' <span class="fbadge">' + activeCount() + '</span>' : '') + '</button>';
+if (g === 'components') {
+var catOpts = GROUPS.components.cats.map(function (c) {
+return checkRow(g, 'cats', c, getCategoryName(c), st.cats.indexOf(c) !== -1);
+}).join('');
+html += fdrop('cats', 'Danh mục', catOpts, st.cats.length || '');
+}
+html += fdrop('prices', 'Khoảng giá', PRICE_BRACKETS.map(function (b) {
+return checkRow(g, 'prices', b.id, b.label, st.prices.indexOf(b.id) !== -1);
+}).join(''), st.prices.length || '');
+if (g === 'monitor' || g === 'laptop') {
+html += fdrop('brands', 'Hãng', brandVals.map(function (v) {
+return checkRow(g, 'brands', String(v).toLowerCase(), getBrandName(v), st.brands.indexOf(String(v).toLowerCase()) !== -1);
+}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.brands.length || '');
+}
+if (g === 'monitor') {
+html += fdrop('res', 'Độ phân giải', distinctValues(products, g, 'resolution').map(function (v) {
+return checkRow(g, 'res', String(v).toLowerCase(), getResolutionName(v), st.res.indexOf(String(v).toLowerCase()) !== -1);
+}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.res.length || '');
+html += fdrop('hz', 'Tần số quét', distinctValues(products, g, 'refreshRate').map(function (v) {
+return checkRow(g, 'hz', String(v), v + 'Hz', st.hz.indexOf(String(v)) !== -1);
+}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.hz.length || '');
+html += fdrop('panels', 'Tấm nền', distinctValues(products, g, 'panel').map(function (v) {
+return checkRow(g, 'panels', String(v).toLowerCase(), v, st.panels.indexOf(String(v).toLowerCase()) !== -1);
+}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.panels.length || '');
+}
+if (g === 'laptop') {
+html += fdrop('ram', 'RAM', distinctValues(products, g, 'ramGb').map(function (v) {
+return checkRow(g, 'ram', String(v), v + 'GB', st.ram.indexOf(String(v)) !== -1);
+}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.ram.length || '');
+}
+html += fdrop('stock', 'Tình trạng sản phẩm', radioRow(g, 'stock', STOCK_OPTS, st.stock), st.stock !== 'all' ? 1 : '');
+html += fdrop('sort', 'Sắp xếp', radioRow(g, 'sort', SORT_OPTS, st.sort), '');
+document.getElementById('filterBar').innerHTML = html;
+}
+
+function toggleDrop(e, id) {
+if (e) e.stopPropagation();
+openDrop = (openDrop === id) ? null : id;
+buildFilterBar();
+}
+
+function onCheck(box) {
+var st = F[box.getAttribute('data-group')];
+var arr = st[box.getAttribute('data-field')];
+var v = box.value;
+if (box.checked) { if (arr.indexOf(v) === -1) arr.push(v); }
+else { var i = arr.indexOf(v); if (i !== -1) arr.splice(i, 1); }
 renderProducts();
 }
 
-function syncPriceLabels() {
-var ml = document.getElementById('monPriceLabel');
-if (ml) ml.textContent = fmtCompact(monState.min) + ' – ' + fmtCompact(monState.max);
-var ll = document.getElementById('lapPriceLabel');
-if (ll) ll.textContent = fmtCompact(lapState.min) + ' – ' + fmtCompact(lapState.max);
+function onPick(radio) {
+F[radio.getAttribute('data-group')][radio.getAttribute('data-field')] = radio.value;
+renderProducts();
 }
 
-function onPriceInput(which) {
-var st = which === 'monitor' ? monState : lapState;
-var minEl = document.getElementById(which === 'monitor' ? 'monMin' : 'lapMin');
-var maxEl = document.getElementById(which === 'monitor' ? 'monMax' : 'lapMax');
-var lo = Number(minEl.value), hi = Number(maxEl.value);
-if (lo > hi) {
-if (document.activeElement === minEl) { lo = hi; minEl.value = lo; }
-else { hi = lo; maxEl.value = hi; }
-}
-st.min = lo; st.max = hi;
+function clearAllFilters() {
+F[currentGroup] = currentGroup === 'components'
+? { cats: [], prices: [], stock: 'all', sort: 'default' }
+: currentGroup === 'monitor'
+? { prices: [], brands: [], res: [], hz: [], panels: [], stock: 'all', sort: 'default' }
+: { prices: [], brands: [], ram: [], stock: 'all', sort: 'default' };
 renderProducts();
 }
 

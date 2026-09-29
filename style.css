@@ -1162,6 +1162,161 @@ box-shadow: 0 10px 30px rgba(0, 212, 255, 0.35);
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* ===== Breadcrumb ===== */
+.crumb {
+text-align: left;
+max-width: 1200px;
+margin: 0 auto 10px;
+padding: 0 20px;
+font-size: 0.9rem;
+color: #666;
+}
+.crumb a { color: #00d4ff; text-decoration: none; }
+.crumb span { margin: 0 8px; color: #444; }
+.crumb b { color: #ddd; font-weight: 600; }
+
+/* ===== Collection filter bar ===== */
+.filter-bar {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: center;
+align-items: flex-start;
+background: rgba(255,255,255,0.02);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 16px;
+padding: 16px 20px;
+margin-bottom: 30px;
+max-width: 1000px;
+margin-left: auto;
+margin-right: auto;
+}
+.fbtn {
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.12);
+color: #ddd;
+border-radius: 10px;
+padding: 10px 16px;
+font-family: inherit;
+font-size: 0.9rem;
+font-weight: 500;
+cursor: pointer;
+display: inline-flex;
+align-items: center;
+gap: 8px;
+white-space: nowrap;
+transition: all 0.2s;
+}
+.fbtn:hover { border-color: #00d4ff; color: #00d4ff; }
+.fbtn .fa-chevron-down { font-size: 0.7rem; color: #666; }
+.fclear { border-style: dashed; }
+.fbadge {
+background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+color: #fff;
+font-size: 0.72rem;
+font-weight: 700;
+min-width: 20px;
+height: 20px;
+border-radius: 10px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 0 6px;
+}
+.fdrop { position: relative; }
+.fdrop.open .fbtn { border-color: #00d4ff; color: #00d4ff; }
+.fpanel {
+display: none;
+position: absolute;
+top: calc(100% + 8px);
+left: 0;
+min-width: 220px;
+max-height: 300px;
+overflow-y: auto;
+background: #14161f;
+border: 1px solid rgba(255,255,255,0.12);
+border-radius: 14px;
+padding: 8px;
+z-index: 600;
+box-shadow: 0 20px 60px rgba(0,0,0,0.65);
+}
+.fdrop.open .fpanel { display: block; }
+.fcheck {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 9px 12px;
+border-radius: 9px;
+color: #ccc;
+font-size: 0.9rem;
+cursor: pointer;
+}
+.fcheck:hover { background: rgba(0, 212, 255, 0.08); color: #fff; }
+.fcheck input {
+appearance: none;
+-webkit-appearance: none;
+width: 17px;
+height: 17px;
+border: 1.5px solid rgba(255,255,255,0.25);
+border-radius: 5px;
+cursor: pointer;
+position: relative;
+flex-shrink: 0;
+margin: 0;
+}
+.fcheck input[type="radio"] { border-radius: 50%; }
+.fcheck input:checked { background: linear-gradient(135deg, #00d4ff, #7b2ff7); border-color: transparent; }
+.fcheck input:checked::after {
+content: '✓';
+position: absolute;
+top: 50%; left: 50%;
+transform: translate(-50%, -50%);
+color: #fff;
+font-size: 0.7rem;
+font-weight: 700;
+}
+.fcheck input[type="radio"]:checked::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #fff; }
+.fempty { color: #555; font-size: 0.85rem; padding: 10px 12px; }
+
+/* ===== Stock state ===== */
+.stock-badge {
+position: absolute;
+top: 12px;
+left: 12px;
+background: rgba(0,0,0,0.7);
+border: 1px solid rgba(255,255,255,0.25);
+color: #fff;
+font-size: 0.75rem;
+font-weight: 600;
+padding: 5px 12px;
+border-radius: 15px;
+z-index: 2;
+}
+.add-cart-btn:disabled {
+background: rgba(255,255,255,0.08);
+color: #666;
+cursor: not-allowed;
+transform: none;
+box-shadow: none;
+}
+.check-line {
+display: flex !important;
+flex-direction: row !important;
+align-items: center;
+gap: 10px !important;
+color: #ddd !important;
+font-size: 0.95rem !important;
+margin-top: 16px !important;
+cursor: pointer;
+}
+.check-line input { width: 18px !important; height: 18px; accent-color: #00d4ff; cursor: pointer; }
+
+@media (max-width: 768px) {
+.filter-bar { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding: 12px 14px; }
+.filter-bar::-webkit-scrollbar { height: 4px; }
+.filter-bar::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 2px; }
+}
+
 /* ===== Admin row thumbs ===== */
 .row-prod { display: flex; gap: 12px; align-items: flex-start; }
 .row-thumb {

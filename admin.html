@@ -120,6 +120,9 @@
 <input type="number" id="fHz" min="0" max="1000" step="1" placeholder="VD: 165">
 <label>RAM (GB) — laptop</label>
 <input type="number" id="fRam" min="0" max="1024" step="1" placeholder="VD: 16">
+<label>Tấm nền (IPS / VA) — màn hình</label>
+<input type="text" id="fPanel" placeholder="VD: IPS">
+<label class="check-line"><input type="checkbox" id="fStock" checked> Còn hàng (bỏ tick = hết hàng)</label>
 <label>Đánh giá (0 - 5)</label>
 <input type="number" id="fRating" min="0" max="5" step="0.1" placeholder="VD: 4.7">
 <label>Mô tả</label>
@@ -292,10 +295,12 @@ function renderRows(products) {
     if (p.brand) specs.push(getBrandName(p.brand));
     if (p.resolution) specs.push(getResolutionName(p.resolution));
     if (p.refreshRate) specs.push(p.refreshRate + 'Hz');
+    if (p.panel) specs.push(p.panel);
     if (p.ramGb) specs.push('RAM ' + p.ramGb + 'GB');
+    var stockTag = inStock(p) ? '' : ' <span class="stock-badge">Hết hàng</span>';
     return '<tr>' +
       '<td>#' + p.id + '</td>' +
-      '<td><div class="row-prod">' + thumb + '<div><b>' + escapeHtml(p.name) + '</b><br><small>' +
+      '<td><div class="row-prod">' + thumb + '<div><b>' + escapeHtml(p.name) + '</b>' + stockTag + '<br><small>' +
       escapeHtml(p.desc || '') + '</small>' + (specs.length ? '<br><small class="row-specs">' + specs.join(' • ') + '</small>' : '') + '</div></div></td>' +
       '<td><span class="product-category">' + getCategoryName(p.category) + '</span></td>' +
       '<td>' + priceCell + '</td>' +
@@ -328,6 +333,8 @@ function openModal(id) {
     document.getElementById('fRes').value = '';
     document.getElementById('fHz').value = '';
     document.getElementById('fRam').value = '';
+    document.getElementById('fPanel').value = '';
+    document.getElementById('fStock').checked = true;
     document.getElementById('fRating').value = '4.5';
     document.getElementById('fDesc').value = '';
     fillBrandDatalist();
@@ -345,6 +352,8 @@ function openModal(id) {
     document.getElementById('fRes').value = p.resolution || '';
     document.getElementById('fHz').value = p.refreshRate || '';
     document.getElementById('fRam').value = p.ramGb || '';
+    document.getElementById('fPanel').value = p.panel || '';
+    document.getElementById('fStock').checked = p.inStock !== false;
     document.getElementById('fRating').value = p.rating;
     document.getElementById('fDesc').value = p.desc || '';
     fillBrandDatalist();
@@ -370,6 +379,8 @@ function readForm() {
   var hz = hzRaw === '' ? null : Number(hzRaw);
   var ramRaw = document.getElementById('fRam').value.trim();
   var ram = ramRaw === '' ? null : Number(ramRaw);
+  var panel = document.getElementById('fPanel').value.trim().toUpperCase();
+  var stock = document.getElementById('fStock').checked;
   var rating = Number(document.getElementById('fRating').value);
   var desc = document.getElementById('fDesc').value.trim();
   if (!name) { err.textContent = 'Vui lòng nhập tên sản phẩm!'; return null; }
@@ -380,6 +391,7 @@ function readForm() {
   if (ram !== null && (!(ram >= 0 && ram <= 1024))) { err.textContent = 'RAM không hợp lệ!'; return null; }
   return { name: name, category: category, price: price, discountPrice: discount,
     imageUrl: imageUrl, brand: brand, resolution: res, refreshRate: hz, ramGb: ram,
+    panel: panel, inStock: stock,
     rating: rating, image: CATEGORY_ICONS[category] || 'fa-box', desc: desc };
 }
 
@@ -446,7 +458,8 @@ function resetData() {
       DEFAULT_PRODUCTS.forEach(function (d) {
         var copy = { name: d.name, category: d.category, price: d.price, rating: d.rating, image: d.image, desc: d.desc,
           imageUrl: d.imageUrl || '', discountPrice: d.discountPrice || null, brand: d.brand || '',
-          resolution: d.resolution || '', refreshRate: d.refreshRate || null, ramGb: d.ramGb || null };
+          resolution: d.resolution || '', refreshRate: d.refreshRate || null, ramGb: d.ramGb || null,
+          panel: d.panel || '', inStock: true };
         seq = seq.then(function () { return apiRequest('POST', '/api/products', copy, session.idToken); });
       });
       return seq;

@@ -46,4 +46,11 @@ public class Product
     // Laptop RAM in GB. Null when not applicable.
     [Range(0, 1024)]
     public int? RamGb { get; set; }
+
+    // In stock or not. Default true.
+    public bool InStock { get; set; } = true;
+
+    // Monitor panel type: e.g. "IPS", "VA". Empty when not applicable.
+    [MaxLength(50)]
+    public string Panel { get; set; } = string.Empty;
 }

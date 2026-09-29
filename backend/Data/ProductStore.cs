@@ -65,6 +65,8 @@ public class ProductStore
             p.Resolution = input.Resolution;
             p.RefreshRate = input.RefreshRate;
             p.RamGb = input.RamGb;
+            p.InStock = input.InStock;
+            p.Panel = input.Panel;
             Persist();
             return Clone(p);
         }
@@ -111,7 +113,8 @@ public class ProductStore
         Id = p.Id, Name = p.Name, Category = p.Category,
         Price = p.Price, Rating = p.Rating, Image = p.Image, Desc = p.Desc,
         ImageUrl = p.ImageUrl, DiscountPrice = p.DiscountPrice, Brand = p.Brand,
-        Resolution = p.Resolution, RefreshRate = p.RefreshRate, RamGb = p.RamGb
+        Resolution = p.Resolution, RefreshRate = p.RefreshRate, RamGb = p.RamGb,
+        InStock = p.InStock, Panel = p.Panel
     };
 
     private static List<Product> SeedProducts() => new()
@@ -135,12 +138,12 @@ public class ProductStore
         new() { Id = 17, Name = "MSI Z790 ACE", Category = "mb", Price = 7990000, Rating = 4.7, Image = "fa-desktop", Desc = "Mainboard LGA1700, DDR5, PCIe 5.0, WiFi 6E" },
         new() { Id = 18, Name = "Gigabyte B650 AORUS Elite", Category = "mb", Price = 4290000, Rating = 4.6, Image = "fa-desktop", Desc = "Mainboard AM5, DDR5, PCIe 5.0, giá tốt" },
         // Monitors
-        new() { Id = 19, Name = "ASUS TUF Gaming VG249Q 23.8\" FHD 144Hz", Category = "monitor", Price = 4290000, Rating = 4.7, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck19/400/300", Brand = "asus", Resolution = "1920x1080", RefreshRate = 144, Desc = "Màn hình gaming 23.8 inch Full HD, 144Hz, 1ms" },
-        new() { Id = 20, Name = "LG UltraGear 27GR75Q 27\" QHD 165Hz", Category = "monitor", Price = 6990000, Rating = 4.8, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck20/400/300", Brand = "lg", Resolution = "2560x1440", RefreshRate = 165, Desc = "Màn hình 27 inch 2K QHD, 165Hz, HDR10" },
-        new() { Id = 21, Name = "Samsung Odyssey G5 32\" QHD 165Hz Cong", Category = "monitor", Price = 8490000, DiscountPrice = 7990000, Rating = 4.7, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck21/400/300", Brand = "samsung", Resolution = "2560x1440", RefreshRate = 165, Desc = "Màn hình cong 32 inch 2K, 165Hz, độ cong 1000R" },
-        new() { Id = 22, Name = "Dell UltraSharp U2723QE 27\" 4K", Category = "monitor", Price = 14990000, Rating = 4.9, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck22/400/300", Brand = "dell", Resolution = "3840x2160", RefreshRate = 60, Desc = "Màn hình đồ họa 27 inch 4K UHD, chuẩn màu 98% DCI-P3" },
-        new() { Id = 23, Name = "MSI Optix MAG274QRF 27\" QHD 165Hz", Category = "monitor", Price = 7490000, Rating = 4.6, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck23/400/300", Brand = "msi", Resolution = "2560x1440", RefreshRate = 165, Desc = "Màn hình Rapid IPS 27 inch 2K, 165Hz, G-Sync" },
-        new() { Id = 24, Name = "Gigabyte M28U 28\" 4K 144Hz", Category = "monitor", Price = 13990000, DiscountPrice = 12490000, Rating = 4.8, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck24/400/300", Brand = "gigabyte", Resolution = "3840x2160", RefreshRate = 144, Desc = "Màn hình 28 inch 4K UHD, 144Hz, HDMI 2.1 cho console" },
+        new() { Id = 19, Name = "ASUS TUF Gaming VG249Q 23.8\" FHD 144Hz", Category = "monitor", Price = 4290000, Rating = 4.7, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck19/400/300", Brand = "asus", Resolution = "1920x1080", RefreshRate = 144, Desc = "Màn hình gaming 23.8 inch Full HD, 144Hz, 1ms", Panel = "IPS" },
+        new() { Id = 20, Name = "LG UltraGear 27GR75Q 27\" QHD 165Hz", Category = "monitor", Price = 6990000, Rating = 4.8, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck20/400/300", Brand = "lg", Resolution = "2560x1440", RefreshRate = 165, Desc = "Màn hình 27 inch 2K QHD, 165Hz, HDR10", Panel = "IPS" },
+        new() { Id = 21, Name = "Samsung Odyssey G5 32\" QHD 165Hz Cong", Category = "monitor", Price = 8490000, DiscountPrice = 7990000, Rating = 4.7, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck21/400/300", Brand = "samsung", Resolution = "2560x1440", RefreshRate = 165, Desc = "Màn hình cong 32 inch 2K, 165Hz, độ cong 1000R", Panel = "VA" },
+        new() { Id = 22, Name = "Dell UltraSharp U2723QE 27\" 4K", Category = "monitor", Price = 14990000, Rating = 4.9, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck22/400/300", Brand = "dell", Resolution = "3840x2160", RefreshRate = 60, Desc = "Màn hình đồ họa 27 inch 4K UHD, chuẩn màu 98% DCI-P3", Panel = "IPS" },
+        new() { Id = 23, Name = "MSI Optix MAG274QRF 27\" QHD 165Hz", Category = "monitor", Price = 7490000, Rating = 4.6, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck23/400/300", Brand = "msi", Resolution = "2560x1440", RefreshRate = 165, Desc = "Màn hình Rapid IPS 27 inch 2K, 165Hz, G-Sync", Panel = "IPS" },
+        new() { Id = 24, Name = "Gigabyte M28U 28\" 4K 144Hz", Category = "monitor", Price = 13990000, DiscountPrice = 12490000, Rating = 4.8, Image = "fa-tv", ImageUrl = "https://picsum.photos/seed/pck24/400/300", Brand = "gigabyte", Resolution = "3840x2160", RefreshRate = 144, Desc = "Màn hình 28 inch 4K UHD, 144Hz, HDMI 2.1 cho console", Panel = "IPS" },
         // Laptops
         new() { Id = 25, Name = "ASUS VivoBook 15 i5/16GB/512GB", Category = "laptop", Price = 16990000, Rating = 4.6, Image = "fa-laptop", ImageUrl = "https://picsum.photos/seed/pck25/400/300", Brand = "asus", RamGb = 16, Desc = "Laptop văn phòng 15.6 inch, Core i5, RAM 16GB, SSD 512GB" },
         new() { Id = 26, Name = "Lenovo Legion 5 RTX 4060/16GB/1TB", Category = "laptop", Price = 32990000, DiscountPrice = 30990000, Rating = 4.8, Image = "fa-laptop", ImageUrl = "https://picsum.photos/seed/pck26/400/300", Brand = "lenovo", RamGb = 16, Desc = "Laptop gaming RTX 4060, RAM 16GB, SSD 1TB, màn 144Hz" },

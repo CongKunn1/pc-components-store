@@ -21,12 +21,12 @@ var DEFAULT_PRODUCTS = [
 {id:16,name:"ASUS ROG Strix B650E-E",category:"mb",price:5990000,rating:4.8,image:"fa-desktop",desc:"Mainboard AM5, DDR5, WiFi 6E, PCIe 5.0"},
 {id:17,name:"MSI Z790 ACE",category:"mb",price:7990000,rating:4.7,image:"fa-desktop",desc:"Mainboard LGA1700, DDR5, PCIe 5.0, WiFi 6E"},
 {id:18,name:"Gigabyte B650 AORUS Elite",category:"mb",price:4290000,rating:4.6,image:"fa-desktop",desc:"Mainboard AM5, DDR5, PCIe 5.0, giá tốt"},
-{id:19,name:"ASUS TUF Gaming VG249Q 23.8\" FHD 144Hz",category:"monitor",price:4290000,rating:4.7,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck19/400/300",brand:"asus",resolution:"1920x1080",refreshRate:144,desc:"Màn hình gaming 23.8 inch Full HD, 144Hz, 1ms"},
-{id:20,name:"LG UltraGear 27GR75Q 27\" QHD 165Hz",category:"monitor",price:6990000,rating:4.8,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck20/400/300",brand:"lg",resolution:"2560x1440",refreshRate:165,desc:"Màn hình 27 inch 2K QHD, 165Hz, HDR10"},
-{id:21,name:"Samsung Odyssey G5 32\" QHD 165Hz Cong",category:"monitor",price:8490000,discountPrice:7990000,rating:4.7,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck21/400/300",brand:"samsung",resolution:"2560x1440",refreshRate:165,desc:"Màn hình cong 32 inch 2K, 165Hz, độ cong 1000R"},
-{id:22,name:"Dell UltraSharp U2723QE 27\" 4K",category:"monitor",price:14990000,rating:4.9,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck22/400/300",brand:"dell",resolution:"3840x2160",refreshRate:60,desc:"Màn hình đồ họa 27 inch 4K UHD, chuẩn màu 98% DCI-P3"},
-{id:23,name:"MSI Optix MAG274QRF 27\" QHD 165Hz",category:"monitor",price:7490000,rating:4.6,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck23/400/300",brand:"msi",resolution:"2560x1440",refreshRate:165,desc:"Màn hình Rapid IPS 27 inch 2K, 165Hz, G-Sync"},
-{id:24,name:"Gigabyte M28U 28\" 4K 144Hz",category:"monitor",price:13990000,discountPrice:12490000,rating:4.8,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck24/400/300",brand:"gigabyte",resolution:"3840x2160",refreshRate:144,desc:"Màn hình 28 inch 4K UHD, 144Hz, HDMI 2.1 cho console"},
+{id:19,name:"ASUS TUF Gaming VG249Q 23.8\" FHD 144Hz",category:"monitor",price:4290000,rating:4.7,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck19/400/300",brand:"asus",resolution:"1920x1080",refreshRate:144,panel:"IPS",desc:"Màn hình gaming 23.8 inch Full HD, 144Hz, 1ms"},
+{id:20,name:"LG UltraGear 27GR75Q 27\" QHD 165Hz",category:"monitor",price:6990000,rating:4.8,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck20/400/300",brand:"lg",resolution:"2560x1440",refreshRate:165,panel:"IPS",desc:"Màn hình 27 inch 2K QHD, 165Hz, HDR10"},
+{id:21,name:"Samsung Odyssey G5 32\" QHD 165Hz Cong",category:"monitor",price:8490000,discountPrice:7990000,rating:4.7,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck21/400/300",brand:"samsung",resolution:"2560x1440",refreshRate:165,panel:"VA",desc:"Màn hình cong 32 inch 2K, 165Hz, độ cong 1000R"},
+{id:22,name:"Dell UltraSharp U2723QE 27\" 4K",category:"monitor",price:14990000,rating:4.9,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck22/400/300",brand:"dell",resolution:"3840x2160",refreshRate:60,panel:"IPS",desc:"Màn hình đồ họa 27 inch 4K UHD, chuẩn màu 98% DCI-P3"},
+{id:23,name:"MSI Optix MAG274QRF 27\" QHD 165Hz",category:"monitor",price:7490000,rating:4.6,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck23/400/300",brand:"msi",resolution:"2560x1440",refreshRate:165,panel:"IPS",desc:"Màn hình Rapid IPS 27 inch 2K, 165Hz, G-Sync"},
+{id:24,name:"Gigabyte M28U 28\" 4K 144Hz",category:"monitor",price:13990000,discountPrice:12490000,rating:4.8,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck24/400/300",brand:"gigabyte",resolution:"3840x2160",refreshRate:144,panel:"IPS",desc:"Màn hình 28 inch 4K UHD, 144Hz, HDMI 2.1 cho console"},
 {id:25,name:"ASUS VivoBook 15 i5/16GB/512GB",category:"laptop",price:16990000,rating:4.6,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck25/400/300",brand:"asus",ramGb:16,desc:"Laptop văn phòng 15.6 inch, Core i5, RAM 16GB, SSD 512GB"},
 {id:26,name:"Lenovo Legion 5 RTX 4060/16GB/1TB",category:"laptop",price:32990000,discountPrice:30990000,rating:4.8,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck26/400/300",brand:"lenovo",ramGb:16,desc:"Laptop gaming RTX 4060, RAM 16GB, SSD 1TB, màn 144Hz"},
 {id:27,name:"HP Pavilion 15 R7/16GB/512GB",category:"laptop",price:19490000,rating:4.5,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck27/400/300",brand:"hp",ramGb:16,desc:"Laptop 15.6 inch Ryzen 7, RAM 16GB, pin 8 giờ"},
@@ -100,7 +100,34 @@ function fmtCompact(n) {
   return String(n);
 }
 
-// Distinct values of a field within a group (for dynamic filter options).
+// Price brackets for the collection filter bar (VND).
+var PRICE_BRACKETS = [
+  { id: 'p1', label: 'Dưới 5 triệu', min: 0, max: 5000000 },
+  { id: 'p2', label: '5 – 10 triệu', min: 5000000, max: 10000000 },
+  { id: 'p3', label: '10 – 20 triệu', min: 10000000, max: 20000000 },
+  { id: 'p4', label: '20 – 30 triệu', min: 20000000, max: 30000000 },
+  { id: 'p5', label: '30 – 50 triệu', min: 30000000, max: 50000000 },
+  { id: 'p6', label: 'Trên 50 triệu', min: 50000000, max: Infinity }
+];
+
+function inStock(p) {
+  return p.inStock !== false;
+}
+
+function matchBracket(p, sel) {
+  if (!sel || !sel.length) return true;
+  var price = effPrice(p);
+  for (var i = 0; i < PRICE_BRACKETS.length; i++) {
+    var b = PRICE_BRACKETS[i];
+    if (sel.indexOf(b.id) !== -1 && price >= b.min && price < b.max) return true;
+  }
+  return false;
+}
+
+function matchMulti(p, field, sel) {
+  if (!sel || !sel.length) return true;
+  return sel.indexOf(String(p[field] == null ? '' : p[field]).toLowerCase()) !== -1;
+}
 function distinctValues(products, groupKey, field) {
   var seen = {};
   var out = [];
