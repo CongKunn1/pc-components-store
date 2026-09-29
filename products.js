@@ -64,6 +64,13 @@ function getResolutionName(res) {
   return RESOLUTION_NAMES[res] || res;
 }
 
+function groupNameOf(cat) {
+  for (var g in GROUPS) {
+    if (GROUPS[g].cats.indexOf(cat) !== -1) return GROUPS[g].name;
+  }
+  return '';
+}
+
 // Effective selling price (discount applied when valid).
 function effPrice(p) {
   var d = Number(p.discountPrice || 0);

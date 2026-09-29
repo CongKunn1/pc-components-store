@@ -241,7 +241,8 @@ specLine(p) +
 function matchQuery(p) {
 var q = currentQuery.toLowerCase();
 if (!q) return true;
-var hay = ((p.name || '') + ' ' + (p.desc || '') + ' ' + (p.brand || '')).toLowerCase();
+var hay = ((p.name || '') + ' ' + (p.desc || '') + ' ' + (p.brand || '') + ' ' +
+getCategoryName(p.category) + ' ' + groupNameOf(p.category)).toLowerCase();
 return hay.indexOf(q) !== -1;
 }
 
@@ -251,6 +252,8 @@ return price >= st.min && price <= st.max;
 }
 
 function applyFilters() {
+// Global search: query searches ALL groups, ignoring group + spec filters.
+if (currentQuery) return products.filter(matchQuery);
 return products.filter(function (p) {
 if (GROUPS[currentGroup].cats.indexOf(p.category) === -1) return false;
 if (!matchQuery(p)) return false;
@@ -277,15 +280,21 @@ return true;
 function renderProducts() {
 buildSpecOptions();
 syncPriceLabels();
+var searching = !!currentQuery;
+document.getElementById('compFilters').style.display = (!searching && currentGroup === 'components') ? '' : 'none';
+document.getElementById('monFilters').style.display = (!searching && currentGroup === 'monitor') ? '' : 'none';
+document.getElementById('lapFilters').style.display = (!searching && currentGroup === 'laptop') ? '' : 'none';
 var list = applyFilters();
 var grid = document.getElementById('productsGrid');
 if (!list.length) {
-grid.innerHTML = '<p class="empty-msg">Không tìm thấy sản phẩm nào phù hợp. Thử nới rộng khoảng giá hoặc từ khóa.</p>';
+grid.innerHTML = '<p class="empty-msg">Không tìm thấy sản phẩm nào phù hợp. Thử từ khóa khác.</p>';
 } else {
 grid.innerHTML = list.map(productCard).join('');
 }
 var sub = document.getElementById('groupSub');
-if (sub) sub.textContent = GROUPS[currentGroup].name + ' • ' + list.length + ' sản phẩm';
+if (sub) sub.textContent = searching
+? 'Kết quả tìm kiếm cho "' + currentQuery + '" • ' + list.length + ' sản phẩm'
+: GROUPS[currentGroup].name + ' • ' + list.length + ' sản phẩm';
 var mc = document.getElementById('monCount');
 if (mc && currentGroup === 'monitor') mc.textContent = 'Tìm thấy ' + list.length + ' sản phẩm';
 var lc = document.getElementById('lapCount');
@@ -345,9 +354,6 @@ document.getElementById('catMenuBtnLabel').textContent = GROUPS[currentGroup].na
 document.querySelectorAll('#compFilters .filter-btn').forEach(function (b) {
 b.classList.toggle('active', b.getAttribute('data-cat') === currentFilter);
 });
-document.getElementById('compFilters').style.display = currentGroup === 'components' ? '' : 'none';
-document.getElementById('monFilters').style.display = currentGroup === 'monitor' ? '' : 'none';
-document.getElementById('lapFilters').style.display = currentGroup === 'laptop' ? '' : 'none';
 }
 
 // ---------- Spec filters (monitor / laptop) ----------
