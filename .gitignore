@@ -2,4 +2,4 @@
 token/
 backend/bin/
 backend/obj/
-backend/Data/
+backend/Data/products.json
