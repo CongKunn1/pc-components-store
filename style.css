@@ -37,9 +37,11 @@ h1, h2, h3, .logo, .hero-text h1 {
 
 /* ===== Header ===== */
 .site-header {
-  background: rgba(246, 241, 232, 0.92);
+  background: var(--card);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
+  box-shadow: 0 3px 22px rgba(120, 90, 60, 0.12);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -758,7 +760,7 @@ input, select, textarea, .btn, .hero-art,
 [data-theme="dark"] .card-img { background: #2b231c; }
 [data-theme="dark"] input::placeholder { color: #6b5d4d; }
 [data-theme="dark"] .site-header,
-[data-theme="dark"] .admin-bar { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4); }
+[data-theme="dark"] .admin-bar { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45); }
 
 /* ===== Theme toggle icon ===== */
 .theme-icon { display: inline-flex; }

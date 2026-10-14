@@ -247,6 +247,7 @@ var CursorFX = (function () {
   var canvas = null, ctx = null, parts = [];
   var running = false, lastX = -9999, lastY = -9999, lastT = 0;
   var MAX = 130;
+  var nextMeteor = -1;
   var COLORS_LIGHT = ['#ff8c42', '#ff6b4a', '#e05b3a', '#ffb03a'];
   var COLORS_DARK = ['#ffd97a', '#ffb37e', '#fff3d6', '#ff9d7e'];
 
@@ -294,8 +295,12 @@ var CursorFX = (function () {
     }
   }
 
-  function frame() {
+  function frame(t) {
     if (!running) return;
+    if (typeof t === 'number' && t - nextMeteor > 4500) {
+      nextMeteor = t;
+      meteor();
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (var i = parts.length - 1; i >= 0; i--) {
       var p = parts[i];
@@ -345,15 +350,43 @@ var CursorFX = (function () {
     spawn(e.clientX, e.clientY, false);
   }
 
+  function meteor() {
+    var pal = palette();
+    var w = (typeof window !== 'undefined' && window.innerWidth) || 800;
+    var x = w * 0.15 + Math.random() * w * 0.75;
+    var y = -30;
+    for (var i = 0; i < 16; i++) {
+      if (parts.length >= MAX) parts.shift();
+      parts.push({
+        x: x - i * 7, y: y + i * 3.5, px: x - i * 7, py: y + i * 3.5,
+        vx: -2.5 - Math.random() * 2, vy: 1.2 + Math.random() * 1.2,
+        life: 1, decay: 0.006 + Math.random() * 0.008,
+        size: 1.4 + Math.random() * 1.6,
+        color: pal[(Math.random() * pal.length) | 0],
+        tw: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
   function init() {
     if (canvas || !canInit()) return false;
     canvas = document.createElement('canvas');
     if (!canvas) return false;
     canvas.id = 'cursor-fx';
-    try { ctx = canvas.getContext('2d'); } catch (e) { ctx = null; }
+    try {
+      canvas.style.position = 'fixed';
+      canvas.style.left = '0';
+      canvas.style.top = '0';
+      canvas.style.width = '100vw';
+      canvas.style.height = '100vh';
+      canvas.style.pointerEvents = 'none';
+      canvas.style.zIndex = '9999';
+      canvas.style.display = 'block';
+    } catch (e) {}
+    try { ctx = canvas.getContext('2d'); } catch (e2) { ctx = null; }
     if (!ctx) { canvas = null; return false; }
     if (document.body && document.body.appendChild) {
-      try { document.body.appendChild(canvas); } catch (e) { canvas = null; return false; }
+      try { document.body.appendChild(canvas); } catch (e3) { canvas = null; return false; }
     } else { canvas = null; return false; }
     resize();
     window.addEventListener('resize', resize);
@@ -384,6 +417,15 @@ var CursorFX = (function () {
 function starBurst() {
   try { CursorFX.burst(); } catch (e) {}
 }
+
+try {
+  if (typeof window !== 'undefined') {
+    window.__cursorState = function () {
+      return { hasCanvas: !!(typeof document !== 'undefined' && document.getElementById && document.getElementById('cursor-fx')),
+        parts: CursorFX._count() };
+    };
+  }
+} catch (e) {}
 
 if (typeof document !== 'undefined' && document.addEventListener) {
   if (document.readyState === 'loading' && document.addEventListener) {
