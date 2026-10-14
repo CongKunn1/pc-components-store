@@ -3,540 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PCKongKun - Linh Kiện, Màn Hình & Laptop</title>
+<title>PCKongKun — Cửa hàng tổng hợp</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<nav class="navbar">
-<div class="nav-container">
-<div class="nav-logo">
-<span class="brand-text">PCKongKun</span>
+
+<div class="topbar">Miễn phí vận chuyển cho đơn hàng từ 500K</div>
+
+<header class="site-header">
+<div class="header-inner">
+<a class="logo" href="#" onclick="goHome();return false;">PCKongKun</a>
+<nav class="main-nav">
+<a href="#" onclick="goHome();return false;">Trang chủ</a>
+<div class="nav-drop">
+<button onclick="toggleNavTypes(event)">Loại sản phẩm <i class="fas fa-chevron-down"></i></button>
+<div class="nav-menu" id="navTypes"></div>
 </div>
-<ul class="nav-links">
-<li><a href="#home" class="active">Trang chủ</a></li>
-<li><a href="#products">Sản phẩm</a></li>
-<li><a href="#about">Giới thiệu</a></li>
-<li><a href="#contact">Liên hệ</a></li>
-<li><a href="admin.html"><i class="fas fa-gear"></i> Quản trị</a></li>
-</ul>
-<button class="cart-btn" onclick="openCart()">
-<i class="fas fa-shopping-cart"></i>
-<span class="cart-count" id="cartCount">0</span>
-</button>
-</div>
+<a href="#contact">Liên hệ</a>
 </nav>
-
-<section id="home" class="hero">
-<div class="hero-content">
-<h1>Linh Kiện, Màn Hình & Laptop</h1>
-<p>Linh kiện máy tính, màn hình gaming và laptop chính hãng — giá cạnh tranh nhất thị trường</p>
-<button class="cta-btn" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Xem Sản Phẩm</button>
-</div>
-<div class="hero-bg">
-<div class="hexagon"></div>
-<div class="hexagon2"></div>
-</div>
-</section>
-
-<section id="products" class="products">
-<div class="container">
-<div class="section-header">
-<nav class="crumb"><a href="#home">Trang chủ</a> <span>/</span> <b id="crumbName">Linh kiện máy tính</b></nav>
-<h2><i class="fas fa-list"></i> Danh Sách Sản Phẩm</h2>
-<p id="groupSub" class="group-sub"></p>
-<div class="cat-menu-wrap">
-<button class="cat-menu-btn" onclick="toggleCatMenu(event)"><i class="fas fa-bars"></i> <span id="catMenuBtnLabel">Danh mục sản phẩm</span> <i class="fas fa-chevron-down"></i></button>
-<div class="cat-menu" id="catMenu">
-<div class="cat-item has-sub">
-<button onclick="toggleSubMenu(event)"><i class="fas fa-microchip"></i> Linh kiện máy tính <i class="fas fa-chevron-right cat-arrow"></i></button>
-<div class="cat-sub">
-<button onclick="selectSub('components','all')">Tất cả linh kiện</button>
-<button onclick="selectSub('components','cpu')">CPU</button>
-<button onclick="selectSub('components','gpu')">GPU / Card màn hình</button>
-<button onclick="selectSub('components','ram')">RAM</button>
-<button onclick="selectSub('components','storage')">Ổ cứng / SSD</button>
-<button onclick="selectSub('components','psu')">Nguồn máy tính</button>
-<button onclick="selectSub('components','mb')">Mainboard</button>
+<div class="header-icons">
+<button class="icon-btn" onclick="toggleSearch()" title="Tìm kiếm"><i class="fas fa-search"></i></button>
+<button class="icon-btn admin-link" onclick="location.href='admin.html'" title="Quản trị"><i class="fas fa-user-gear"></i></button>
 </div>
 </div>
-<div class="cat-item">
-<button onclick="selectGroup('monitor')"><i class="fas fa-tv"></i> Màn hình máy tính</button>
-</div>
-<div class="cat-item">
-<button onclick="selectGroup('laptop')"><i class="fas fa-laptop"></i> Laptop</button>
-</div>
-</div>
-</div>
-<div class="search-row">
+<div class="search-bar" id="searchBar" style="display:none">
 <i class="fas fa-search"></i>
-<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm (tên, hãng, danh mục...)" oninput="onSearch(this.value)">
+<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm, hãng..." oninput="onSearch(this.value)">
 </div>
-<div class="filter-bar" id="filterBar"></div>
+</header>
+
+<section class="hero">
+<div class="hero-text">
+<h1 id="heroTitle">Tất cả sản phẩm</h1>
+<p id="heroSub">Tuyển chọn đồ điện tử, mỹ phẩm, gia dụng và thời trang — bấm vào sản phẩm để mua trên Shopee.</p>
 </div>
-<div class="products-grid" id="productsGrid">
-</div>
+<div class="hero-art" aria-hidden="true">
+<div class="hero-circle"></div>
+<div class="hero-circle small"></div>
+<div class="hero-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+<p>Yêu thích<br>của khách hàng</p>
 </div>
 </section>
 
-<section id="about" class="about">
-<div class="container">
-<div class="about-grid">
-<div class="about-text">
-<h2>Về Chúng Tôi</h2>
-<p>PCKongKun là cửa hàng máy tính uy tín với hơn 5 năm kinh nghiệm. Chúng tôi cung cấp linh kiện, màn hình và laptop chất lượng cao với giá cả phải chăng, đảm bảo mang đến trải nghiệm tốt nhất cho khách hàng.</p>
-<div class="stats">
-<div class="stat-item"><h3>500+</h3><p>Sản phẩm</p></div>
-<div class="stat-item"><h3>10,000+</h3><p>Khách hàng</p></div>
-<div class="stat-item"><h3>99%</h3><p>Đánh giá tốt</p></div>
-</div>
-</div>
-<div class="about-features">
-<div class="feature-card"><i class="fas fa-shield-alt"></i><h3>Bảo Hành Chính Hãng</h3></div>
-<div class="feature-card"><i class="fas fa-truck"></i><h3>Giao Hàng Nhanh</h3></div>
-<div class="feature-card"><i class="fas fa-headset"></i><h3>Hỗ Trợ 24/7</h3></div>
-<div class="feature-card"><i class="fas fa-undo"></i><h3>Đổi Trả Dễ Dàng</h3></div>
-</div>
-</div>
-</div>
-</section>
+<main class="container">
+<div class="filter-row" id="filterRow"></div>
+<p class="result-line" id="resultLine"></p>
+<div class="grid" id="grid"></div>
+</main>
 
-<footer class="footer">
-<div class="container">
-<div class="footer-content">
-<div class="footer-section">
-<h3><i class="fas fa-microchip"></i> PCKongKun</h3>
-<p>Cửa hàng linh kiện máy tính hàng đầu Việt Nam.</p>
+<footer class="site-footer" id="contact">
+<div class="container foot-grid">
+<div>
+<h4 class="logo">PCKongKun</h4>
+<p>Cửa hàng tổng hợp: đồ điện tử, mỹ phẩm, gia dụng, thời trang. Bấm vào sản phẩm để mua trực tiếp trên Shopee.</p>
 </div>
-<div class="footer-section">
-<h4>Danh Mục</h4>
-<a href="#">CPU</a><a href="#">GPU</a><a href="#">RAM</a><a href="#">SSD</a>
+<div>
+<h5>Loại sản phẩm</h5>
+<div id="footTypes"></div>
 </div>
-<div class="footer-section">
-<h4>Liên hệ</h4>
-<p><i class="fas fa-envelope"></i> info@pcpartsstore.vn</p>
+<div>
+<h5>Liên hệ</h5>
+<p><i class="fas fa-envelope"></i> info@pckongkun.vn</p>
 <p><i class="fas fa-phone"></i> 0901 234 567</p>
+<p><a href="admin.html"><i class="fas fa-user-gear"></i> Quản trị</a></p>
 </div>
 </div>
-<div class="footer-bottom">
-<p>&copy; 2026 PCKongKun. All Rights Reserved.</p>
-<p class="author-line">Developed by <b>kongkun</b></p>
-</div>
+<div class="foot-bottom">
+<p>&copy; 2026 PCKongKun. All rights reserved. &nbsp;•&nbsp; Developed by <b>kongkun</b></p>
 </div>
 </footer>
 
-<div id="cartOverlay" class="cart-overlay" onclick="closeCart()"></div>
-<aside id="cartDrawer" class="cart-drawer">
-<div class="cart-head">
-<h3><i class="fas fa-shopping-cart"></i> Giỏ hàng</h3>
-<button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
-</div>
-<div id="cartItems" class="cart-items"></div>
-<div class="cart-foot">
-<div class="cart-total"><span>Tổng cộng:</span><b id="cartTotal">0 VNĐ</b></div>
-<button class="cta-btn cart-checkout" onclick="checkout()">Thanh toán</button>
-</div>
-</aside>
 <div id="toast" class="toast"></div>
 
 <script src="config.js"></script>
 <script src="products.js"></script>
 <script>
 var products = [];
-var currentGroup = 'components';
+var currentType = 'all';
 var currentQuery = '';
 var openDrop = null;
-// Per-group filter state. Empty arrays = no restriction.
-var F = {
-  components: { cats: [], prices: [], stock: 'all', sort: 'default' },
-  monitor: { prices: [], brands: [], res: [], hz: [], panels: [], stock: 'all', sort: 'default' },
-  laptop: { prices: [], brands: [], ram: [], stock: 'all', sort: 'default' }
-};
+var F = { prices: [], brands: [], stock: 'all', sort: 'featured' };
+
+var SORT_OPTS = [
+  { id: 'featured', label: 'Nổi bật' },
+  { id: 'price-asc', label: 'Giá thấp đến cao' },
+  { id: 'price-desc', label: 'Giá cao đến thấp' },
+  { id: 'rating', label: 'Đánh giá cao nhất' }
+];
 var STOCK_OPTS = [
   { id: 'all', label: 'Tất cả' },
   { id: 'in', label: 'Còn hàng' },
   { id: 'out', label: 'Hết hàng' }
 ];
-var SORT_OPTS = [
-  { id: 'default', label: 'Mặc định' },
-  { id: 'price-asc', label: 'Giá thấp đến cao' },
-  { id: 'price-desc', label: 'Giá cao đến thấp' },
-  { id: 'rating', label: 'Đánh giá cao nhất' }
-];
 
-function escapeAttr(s) {
-return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+function money(n) { return Number(n || 0).toLocaleString('vi-VN') + ' VNĐ'; }
 
-function mediaHtml(p) {
-var html = '';
-if (p.imageUrl) {
-html += '<img src="' + p.imageUrl + '" alt="' + escapeAttr(p.name) + '" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.querySelector(\'.product-icon-fallback\').style.display=\'flex\'">';
+function goHome() {
+  currentType = 'all'; currentQuery = '';
+  document.getElementById('searchInput').value = '';
+  F = { prices: [], brands: [], stock: 'all', sort: 'featured' };
+  renderAll();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-html += '<div class="product-icon-fallback"' + (p.imageUrl ? ' style="display:none"' : '') + '><i class="fas ' + (p.image || 'fa-box') + '"></i></div>';
-var pct = discountPct(p);
-if (pct > 0) html += '<span class="discount-badge">-' + pct + '%</span>';
-if (!inStock(p)) html += '<span class="stock-badge">Hết hàng</span>';
-html += '<div class="card-hover"><button onclick="addToCart(' + p.id + ')"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button></div>';
-return html;
+function toggleSearch() {
+  var bar = document.getElementById('searchBar');
+  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+  if (bar.style.display !== 'none') document.getElementById('searchInput').value = '', onSearch('');
+  else document.getElementById('searchInput').focus();
 }
-
-function priceHtml(p) {
-var pct = discountPct(p);
-if (pct > 0) {
-return '<div class="price-wrap"><span class="old-price">' + Number(p.price).toLocaleString() + ' VNĐ</span>' +
-'<span class="product-price">' + effPrice(p).toLocaleString() + ' VNĐ</span></div>';
-}
-return '<span class="product-price">' + Number(p.price).toLocaleString() + ' VNĐ</span>';
-}
-
-function specLine(p) {
-var parts = [];
-if (p.brand) parts.push(getBrandName(p.brand));
-if (p.resolution) parts.push(getResolutionName(p.resolution));
-if (p.refreshRate) parts.push(p.refreshRate + 'Hz');
-if (p.panel) parts.push(p.panel);
-if (p.ramGb) parts.push('RAM ' + p.ramGb + 'GB');
-if (!parts.length) return '';
-return '<div class="product-specs">' + parts.join(' • ') + '</div>';
-}
-
-function productCard(p) {
-return '<div class="product-card" data-category="' + p.category + '">' +
-'<div class="product-image">' + mediaHtml(p) + '</div>' +
-'<div class="product-info">' +
-'<span class="product-category">' + getCategoryName(p.category) + '</span>' +
-'<h3>' + p.name + '</h3>' +
-specLine(p) +
-'<p>' + (p.desc || '') + '</p>' +
-'<div class="product-rating">' +
-'<i class="fas fa-star"></i>'.repeat(Math.floor(p.rating)) + '<i class="fas fa-star-half-alt"></i>'.repeat(p.rating % 1 >= 0.5 ? 1 : 0) +
-'<span>' + p.rating + '</span></div>' +
-'<div class="product-footer">' + priceHtml(p) +
-(inStock(p)
-? '<button class="add-cart-btn" onclick="addToCart(' + p.id + ')">Thêm vào giỏ</button>'
-: '<button class="add-cart-btn" disabled>Hết hàng</button>') +
-'</div></div></div>';
-}
-
-function matchQuery(p) {
-var q = currentQuery.toLowerCase();
-if (!q) return true;
-var hay = ((p.name || '') + ' ' + (p.desc || '') + ' ' + (p.brand || '') + ' ' +
-getCategoryName(p.category) + ' ' + groupNameOf(p.category)).toLowerCase();
-return hay.indexOf(q) !== -1;
-}
-
-function inPrice(p, st) {
-var price = effPrice(p);
-return price >= st.min && price <= st.max;
-}
-
-function applyFilters() {
-// Global search: query searches ALL groups, ignoring group + spec filters.
-if (currentQuery) return sortList(products.filter(matchQuery), F[currentGroup].sort);
-var st = F[currentGroup];
-var list = products.filter(function (p) {
-if (GROUPS[currentGroup].cats.indexOf(p.category) === -1) return false;
-if (currentGroup === 'components' && st.cats.length && st.cats.indexOf(p.category) === -1) return false;
-if (!matchBracket(p, st.prices)) return false;
-if ((currentGroup === 'monitor' || currentGroup === 'laptop') && !matchMulti(p, 'brand', st.brands)) return false;
-if (currentGroup === 'monitor') {
-if (!matchMulti(p, 'resolution', st.res)) return false;
-if (st.hz.length && st.hz.indexOf(String(p.refreshRate == null ? '' : p.refreshRate)) === -1) return false;
-if (!matchMulti(p, 'panel', st.panels)) return false;
-}
-if (currentGroup === 'laptop' && st.ram.length && st.ram.indexOf(String(p.ramGb == null ? '' : p.ramGb)) === -1) return false;
-if (st.stock === 'in' && !inStock(p)) return false;
-if (st.stock === 'out' && inStock(p)) return false;
-return true;
-});
-return sortList(list, st.sort);
-}
-
-function sortList(list, mode) {
-var a = list.slice();
-if (mode === 'price-asc') a.sort(function (x, y) { return effPrice(x) - effPrice(y); });
-else if (mode === 'price-desc') a.sort(function (x, y) { return effPrice(y) - effPrice(x); });
-else if (mode === 'rating') a.sort(function (x, y) { return (y.rating || 0) - (x.rating || 0); });
-return a;
-}
-
-function renderProducts() {
-buildFilterBar();
-var searching = !!currentQuery;
-var list = applyFilters();
-var grid = document.getElementById('productsGrid');
-if (!list.length) {
-grid.innerHTML = '<p class="empty-msg">Không tìm thấy sản phẩm nào phù hợp với tiêu chí lọc.</p>';
-} else {
-grid.innerHTML = list.map(productCard).join('');
-}
-var sub = document.getElementById('groupSub');
-if (sub) sub.textContent = searching
-? 'Kết quả tìm kiếm cho "' + currentQuery + '" • ' + list.length + ' sản phẩm'
-: GROUPS[currentGroup].name + ' • ' + list.length + ' sản phẩm';
-var crumb = document.getElementById('crumbName');
-if (crumb) crumb.textContent = searching ? 'Tìm kiếm' : GROUPS[currentGroup].name;
-}
-
-function onSearch(val) {
-currentQuery = val.trim();
-renderProducts();
-}
-
-// ---------- Category menu ----------
-function toggleCatMenu(e) {
-if (e) e.stopPropagation();
-document.getElementById('catMenu').classList.toggle('show');
-}
-function toggleSubMenu(e) {
-if (e) e.stopPropagation();
-var item = e.target.closest('.cat-item');
-var was = item.classList.contains('open');
-document.querySelectorAll('.cat-item.open').forEach(function (x) { x.classList.remove('open'); });
-if (!was) item.classList.add('open');
-}
-function closeMenus() {
-var m = document.getElementById('catMenu');
-if (m) m.classList.remove('show');
-document.querySelectorAll('.cat-item.open').forEach(function (x) { x.classList.remove('open'); });
-if (openDrop !== null) { openDrop = null; buildFilterBar(); }
+function toggleNavTypes(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('navTypes').classList.toggle('show');
 }
 document.addEventListener('click', function () {
-closeMenus();
+  var n = document.getElementById('navTypes');
+  if (n) n.classList.remove('show');
+  if (openDrop !== null) { openDrop = null; buildFilters(); }
 });
+function onSearch(v) { currentQuery = v.trim(); renderAll(); }
 
-function selectGroup(g) {
-currentGroup = g;
-closeMenus();
-syncGroupUI();
-renderProducts();
+function matchQuery(p) {
+  var q = currentQuery.toLowerCase();
+  if (!q) return true;
+  var hay = ((p.name || '') + ' ' + (p.title || '') + ' ' + (p.brand || '') + ' ' +
+    getTypeName(p.type)).toLowerCase();
+  return hay.indexOf(q) !== -1;
+}
+function matchBracket(p, sel) {
+  if (!sel || !sel.length) return true;
+  var price = effPrice(p);
+  for (var i = 0; i < PRICE_BRACKETS.length; i++) {
+    var b = PRICE_BRACKETS[i];
+    if (sel.indexOf(b.id) !== -1 && price >= b.min && price < b.max) return true;
+  }
+  return false;
+}
+function applyFilters() {
+  var list = products.filter(function (p) {
+    if (currentType !== 'all' && p.type !== currentType) return false;
+    if (!matchBracket(p, F.prices)) return false;
+    if (F.brands.length && F.brands.indexOf(String(p.brand || '').toLowerCase()) === -1) return false;
+    if (F.stock === 'in' && !inStock(p)) return false;
+    if (F.stock === 'out' && inStock(p)) return false;
+    return matchQuery(p);
+  });
+  if (F.sort === 'price-asc') list.sort(function (a, b) { return effPrice(a) - effPrice(b); });
+  else if (F.sort === 'price-desc') list.sort(function (a, b) { return effPrice(b) - effPrice(a); });
+  else if (F.sort === 'rating') list.sort(function (a, b) { return (b.rating || 0) - (a.rating || 0); });
+  return list;
 }
 
-function selectSub(g, cat) {
-currentGroup = g;
-F.components.cats = (cat === 'all') ? [] : [cat];
-closeMenus();
-syncGroupUI();
-renderProducts();
+function checkRow(field, value, label, checked) {
+  return '<label class="fcheck"><input type="checkbox" data-field="' + field + '" value="' + esc(value) + '"' +
+    (checked ? ' checked' : '') + ' onchange="onCheck(this)"><span></span>' + esc(label) + '</label>';
 }
-
-function syncGroupUI() {
-document.getElementById('catMenuBtnLabel').textContent = GROUPS[currentGroup].name;
+function radioRow(field, opts, current) {
+  return opts.map(function (o) {
+    return '<label class="fcheck"><input type="radio" name="f-' + field + '" data-field="' + field + '" value="' + o.id + '"' +
+      (o.id === current ? ' checked' : '') + ' onchange="onPick(this)"><span></span>' + esc(o.label) + '</label>';
+  }).join('');
 }
-
-// ---------- Filter bar (collection style) ----------
-function esc(s) {
-return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function checkRow(group, field, value, label, checked) {
-return '<label class="fcheck"><input type="checkbox" data-group="' + group + '" data-field="' + field + '" value="' + esc(value) + '"' +
-(checked ? ' checked' : '') + ' onchange="onCheck(this)"><span></span>' + esc(label) + '</label>';
-}
-
-function radioRow(group, field, opts, current) {
-return opts.map(function (o) {
-return '<label class="fcheck"><input type="radio" name="' + group + '-' + field + '" data-group="' + group + '" data-field="' + field + '" value="' + o.id + '"' +
-(o.id === current ? ' checked' : '') + ' onchange="onPick(this)"><span></span>' + esc(o.label) + '</label>';
-}).join('');
-}
-
 function fdrop(id, title, inner, badge) {
-return '<div class="fdrop' + (openDrop === id ? ' open' : '') + '" id="fd-' + id + '">' +
-'<button class="fbtn" onclick="toggleDrop(event,\'' + id + '\')">' + esc(title) +
-(badge ? ' <span class="fbadge">' + badge + '</span>' : '') + ' <i class="fas fa-chevron-down"></i></button>' +
-'<div class="fpanel" onclick="event.stopPropagation()">' + inner + '</div></div>';
+  return '<div class="fdrop' + (openDrop === id ? ' open' : '') + '">' +
+    '<button class="fbtn" onclick="toggleDrop(event,\'' + id + '\')">' + esc(title) +
+    (badge ? ' <span class="fbadge">' + badge + '</span>' : '') + ' <i class="fas fa-chevron-down"></i></button>' +
+    '<div class="fpanel" onclick="event.stopPropagation()">' + inner + '</div></div>';
 }
-
-function activeCount() {
-var st = F[currentGroup];
-var n = 0;
-['cats', 'prices', 'brands', 'res', 'hz', 'panels', 'ram'].forEach(function (k) {
-if (st[k] && st[k].length) n += st[k].length;
-});
-if (st.stock !== 'all') n += 1;
-return n;
-}
-
-function buildFilterBar() {
-var g = currentGroup, st = F[g];
-var brandVals = distinctValues(products, g, 'brand');
-var html = '<button class="fbtn fclear" onclick="clearAllFilters()"><i class="fas fa-filter"></i> Bộ lọc' +
-(activeCount() ? ' <span class="fbadge">' + activeCount() + '</span>' : '') + '</button>';
-if (g === 'components') {
-var catOpts = GROUPS.components.cats.map(function (c) {
-return checkRow(g, 'cats', c, getCategoryName(c), st.cats.indexOf(c) !== -1);
-}).join('');
-html += fdrop('cats', 'Danh mục', catOpts, st.cats.length || '');
-}
-html += fdrop('prices', 'Khoảng giá', PRICE_BRACKETS.map(function (b) {
-return checkRow(g, 'prices', b.id, b.label, st.prices.indexOf(b.id) !== -1);
-}).join(''), st.prices.length || '');
-if (g === 'monitor' || g === 'laptop') {
-html += fdrop('brands', 'Hãng', brandVals.map(function (v) {
-return checkRow(g, 'brands', String(v).toLowerCase(), getBrandName(v), st.brands.indexOf(String(v).toLowerCase()) !== -1);
-}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.brands.length || '');
-}
-if (g === 'monitor') {
-html += fdrop('res', 'Độ phân giải', distinctValues(products, g, 'resolution').map(function (v) {
-return checkRow(g, 'res', String(v).toLowerCase(), getResolutionName(v), st.res.indexOf(String(v).toLowerCase()) !== -1);
-}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.res.length || '');
-html += fdrop('hz', 'Tần số quét', distinctValues(products, g, 'refreshRate').map(function (v) {
-return checkRow(g, 'hz', String(v), v + 'Hz', st.hz.indexOf(String(v)) !== -1);
-}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.hz.length || '');
-html += fdrop('panels', 'Tấm nền', distinctValues(products, g, 'panel').map(function (v) {
-return checkRow(g, 'panels', String(v).toLowerCase(), v, st.panels.indexOf(String(v).toLowerCase()) !== -1);
-}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.panels.length || '');
-}
-if (g === 'laptop') {
-html += fdrop('ram', 'RAM', distinctValues(products, g, 'ramGb').map(function (v) {
-return checkRow(g, 'ram', String(v), v + 'GB', st.ram.indexOf(String(v)) !== -1);
-}).join('') || '<p class="fempty">Chưa có dữ liệu</p>', st.ram.length || '');
-}
-html += fdrop('stock', 'Tình trạng sản phẩm', radioRow(g, 'stock', STOCK_OPTS, st.stock), st.stock !== 'all' ? 1 : '');
-html += fdrop('sort', 'Sắp xếp', radioRow(g, 'sort', SORT_OPTS, st.sort), '');
-document.getElementById('filterBar').innerHTML = html;
-}
-
 function toggleDrop(e, id) {
-if (e) e.stopPropagation();
-openDrop = (openDrop === id) ? null : id;
-buildFilterBar();
+  if (e) e.stopPropagation();
+  openDrop = (openDrop === id) ? null : id;
+  buildFilters();
 }
-
 function onCheck(box) {
-var st = F[box.getAttribute('data-group')];
-var arr = st[box.getAttribute('data-field')];
-var v = box.value;
-if (box.checked) { if (arr.indexOf(v) === -1) arr.push(v); }
-else { var i = arr.indexOf(v); if (i !== -1) arr.splice(i, 1); }
-renderProducts();
+  var arr = F[box.getAttribute('data-field')];
+  var v = box.value;
+  if (box.checked) { if (arr.indexOf(v) === -1) arr.push(v); }
+  else { var i = arr.indexOf(v); if (i !== -1) arr.splice(i, 1); }
+  renderAll();
 }
-
 function onPick(radio) {
-F[radio.getAttribute('data-group')][radio.getAttribute('data-field')] = radio.value;
-renderProducts();
+  F[radio.getAttribute('data-field')] = radio.value;
+  renderAll();
+}
+function activeCount() {
+  var n = F.prices.length + F.brands.length;
+  if (F.stock !== 'all') n += 1;
+  return n;
+}
+function clearFilters() {
+  F = { prices: [], brands: [], stock: 'all', sort: 'featured' };
+  renderAll();
 }
 
-function clearAllFilters() {
-F[currentGroup] = currentGroup === 'components'
-? { cats: [], prices: [], stock: 'all', sort: 'default' }
-: currentGroup === 'monitor'
-? { prices: [], brands: [], res: [], hz: [], panels: [], stock: 'all', sort: 'default' }
-: { prices: [], brands: [], ram: [], stock: 'all', sort: 'default' };
-renderProducts();
+function buildFilters() {
+  var types = distinctTypes(products);
+  var typeOpts = '<label class="fcheck"><input type="radio" name="f-type" value="all"' +
+    (currentType === 'all' ? ' checked' : '') + ' onchange="pickType(this.value)"><span></span>Tất cả</label>' +
+    types.map(function (t) {
+      return '<label class="fcheck"><input type="radio" name="f-type" value="' + esc(t) + '"' +
+        (t === currentType ? ' checked' : '') + ' onchange="pickType(this.value)"><span></span>' + esc(getTypeName(t)) + '</label>';
+    }).join('');
+  var priceOpts = PRICE_BRACKETS.map(function (b) {
+    return checkRow('prices', b.id, b.label, F.prices.indexOf(b.id) !== -1);
+  }).join('');
+  var brandOpts = distinctValues(products, 'brand').map(function (v) {
+    var k = String(v).toLowerCase();
+    return checkRow('brands', k, getBrandName(v), F.brands.indexOf(k) !== -1);
+  }).join('') || '<p class="fempty">Chưa có dữ liệu</p>';
+  var html = '<button class="fbtn fclear" onclick="clearFilters()"><i class="fas fa-filter"></i> Bộ lọc' +
+    (activeCount() ? ' <span class="fbadge">' + activeCount() + '</span>' : '') + '</button>' +
+    fdrop('types', currentType === 'all' ? 'Loại sản phẩm' : getTypeName(currentType), typeOpts, currentType === 'all' ? '' : 1) +
+    fdrop('prices', 'Giá', priceOpts, F.prices.length || '') +
+    fdrop('brands', 'Hãng', brandOpts, F.brands.length || '') +
+    fdrop('sort', 'Sắp xếp: ' + sortLabel(), radioRow('sort', SORT_OPTS, F.sort), '') +
+    fdrop('stock', 'Tình trạng', radioRow('stock', STOCK_OPTS, F.stock), F.stock !== 'all' ? 1 : '');
+  document.getElementById('filterRow').innerHTML = html;
+}
+function sortLabel() {
+  for (var i = 0; i < SORT_OPTS.length; i++) if (SORT_OPTS[i].id === F.sort) return SORT_OPTS[i].label;
+  return 'Nổi bật';
+}
+function pickType(t) {
+  currentType = t;
+  renderAll();
 }
 
-function showToast(msg) {
-var t = document.getElementById('toast');
-t.textContent = msg;
-t.classList.add('show');
-clearTimeout(t._timer);
-t._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+function cardHtml(p) {
+  var pct = discountPct(p);
+  var stocked = inStock(p);
+  var badges = '';
+  if (pct > 0) badges += '<span class="badge sale">-' + pct + '%</span>';
+  else if ((p.rating || 0) >= 4.8) badges += '<span class="badge hot">Bán chạy</span>';
+  if (!stocked) badges += '<span class="badge out">Hết hàng</span>';
+  var img = p.imageUrl
+    ? '<img src="' + p.imageUrl + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.remove()">'
+    : '<span class="img-fallback"><i class="fas fa-box-open"></i></span>';
+  var price = pct > 0
+    ? '<div class="price"><b>' + money(effPrice(p)) + '</b><s>' + money(p.price) + '</s></div>'
+    : '<div class="price"><b>' + money(p.price) + '</b></div>';
+  return '<article class="card' + (stocked ? '' : ' soldout') + '" onclick="openProduct(' + p.id + ')">' +
+    '<div class="card-img">' + img + badges + '</div>' +
+    '<div class="card-body"><h3>' + esc(p.name) + '</h3>' +
+    (p.title ? '<p class="card-sub">' + esc(p.title) + '</p>' : '') +
+    price +
+    '<p class="card-rate"><i class="fas fa-star"></i> ' + (p.rating || '–') + ' • ' + esc(getBrandName(p.brand)) + '</p>' +
+    '</div></article>';
 }
 
-// ---------- Shopping cart (per-user, stored in this browser) ----------
-var CART_KEY = 'pc_parts_cart_v1';
-
-function getCart() {
-try {
-const raw = localStorage.getItem(CART_KEY);
-const parsed = raw ? JSON.parse(raw) : [];
-return Array.isArray(parsed) ? parsed : [];
-} catch (e) { return []; }
+function openProduct(id) {
+  var p = null;
+  for (var i = 0; i < products.length; i++) if (products[i].id === id) { p = products[i]; break; }
+  if (!p) return;
+  if (!inStock(p)) { toast('Sản phẩm tạm hết hàng'); return; }
+  if (p.shopeeUrl) { window.open(p.shopeeUrl, '_blank', 'noopener'); return; }
+  toast('Sản phẩm chưa cập nhật link Shopee');
 }
 
-function saveCart(cart) {
-localStorage.setItem(CART_KEY, JSON.stringify(cart));
-updateCartCount();
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function () { t.classList.remove('show'); }, 2000);
 }
 
-function updateCartCount() {
-const n = getCart().reduce((s, i) => s + i.qty, 0);
-document.getElementById('cartCount').textContent = n;
+function renderAll() {
+  buildFilters();
+  buildNavTypes();
+  var list = applyFilters();
+  var grid = document.getElementById('grid');
+  grid.innerHTML = list.length
+    ? list.map(cardHtml).join('')
+    : '<p class="empty">Không tìm thấy sản phẩm nào phù hợp với tiêu chí lọc.</p>';
+  var line = document.getElementById('resultLine');
+  var title = currentType === 'all' ? 'Tất cả sản phẩm' : getTypeName(currentType);
+  document.getElementById('heroTitle').textContent = title;
+  line.textContent = currentQuery
+    ? 'Kết quả cho "' + currentQuery + '" • ' + list.length + ' sản phẩm'
+    : title + ' • ' + list.length + ' sản phẩm';
 }
 
-function addToCart(id) {
-const p = products.find(pr => pr.id === id);
-if (!p) return;
-const cart = getCart();
-const line = cart.find(i => i.id === id);
-if (line) line.qty += 1;
-else cart.push({id: p.id, name: p.name, price: effPrice(p), qty: 1});
-saveCart(cart);
-renderCart();
-showToast('Đã thêm "' + p.name + '" vào giỏ hàng');
+function buildNavTypes() {
+  var types = distinctTypes(products);
+  var nav = document.getElementById('navTypes');
+  nav.innerHTML = '<button onclick="pickType(\'all\')">Tất cả sản phẩm</button>' + types.map(function (t) {
+    return '<button onclick="pickType(\'' + t + '\')">' + esc(getTypeName(t)) + '</button>';
+  }).join('');
+  var foot = document.getElementById('footTypes');
+  if (foot) foot.innerHTML = types.map(function (t) {
+    return '<a href="#" onclick="pickType(\'' + t + '\');return false;">' + esc(getTypeName(t)) + '</a>';
+  }).join('');
 }
 
-function changeQty(id, delta) {
-const cart = getCart();
-const line = cart.find(i => i.id === id);
-if (!line) return;
-line.qty += delta;
-if (line.qty <= 0) cart.splice(cart.indexOf(line), 1);
-saveCart(cart);
-renderCart();
-}
-
-function removeFromCart(id) {
-saveCart(getCart().filter(i => i.id !== id));
-renderCart();
-}
-
-function cartTotal() {
-return getCart().reduce((s, i) => s + i.price * i.qty, 0);
-}
-
-function renderCart() {
-const box = document.getElementById('cartItems');
-const cart = getCart();
-if (!cart.length) {
-box.innerHTML = '<p class="empty-msg">Giỏ hàng đang trống.</p>';
-} else {
-box.innerHTML = cart.map(i => `
-<div class="cart-line">
-<div class="cart-line-info"><b>${i.name}</b><span>${i.price.toLocaleString()} VNĐ</span></div>
-<div class="cart-line-ctl">
-<button onclick="changeQty(${i.id},-1)">−</button>
-<span>${i.qty}</span>
-<button onclick="changeQty(${i.id},1)">+</button>
-<button class="cart-remove" onclick="removeFromCart(${i.id})"><i class="fas fa-trash"></i></button>
-</div>
-</div>`).join('');
-}
-document.getElementById('cartTotal').textContent = cartTotal().toLocaleString() + ' VNĐ';
-}
-
-function openCart() {
-document.getElementById('cartDrawer').classList.add('open');
-document.getElementById('cartOverlay').classList.add('show');
-renderCart();
-}
-
-function closeCart() {
-document.getElementById('cartDrawer').classList.remove('open');
-document.getElementById('cartOverlay').classList.remove('show');
-}
-
-function checkout() {
-const cart = getCart();
-if (!cart.length) { alert('Giỏ hàng đang trống!'); return; }
-alert(`Đặt hàng thành công! Tổng: ${cartTotal().toLocaleString()} VNĐ\nCảm ơn bạn đã mua sắm tại PCKongKun.`);
-saveCart([]);
-renderCart();
-closeCart();
-}
-
-// Load catalog from the .NET API when reachable, else local defaults.
 loadProductsAsync().then(function (list) {
-products = list;
-syncGroupUI();
-renderProducts();
-updateCartCount();
-renderCart();
+  products = list;
+  renderAll();
 });
 </script>
 </body>

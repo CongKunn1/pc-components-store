@@ -1,74 +1,45 @@
 // Shared product data layer - used by index.html and admin.html
 // Products are persisted in localStorage so the admin dashboard can manage them.
-var PRODUCTS_KEY = 'pc_parts_products_v1';
+var PRODUCTS_KEY = 'pc_parts_products_v2';
 
 var DEFAULT_PRODUCTS = [
-{id:1,name:"AMD Ryzen 9 7950X",category:"cpu",price:15990000,rating:4.8,image:"fa-microchip",desc:"CPU 16 lõi, 32 luồng, hiệu năng vượt trội cho gaming và multitasking"},
-{id:2,name:"Intel Core i9-14900K",category:"cpu",price:18990000,rating:4.7,image:"fa-microchip",desc:"CPU 24 lõi, 32 luồng, xung nhịp lên đến 6.0GHz"},
-{id:3,name:"AMD Ryzen 7 7800X3D",category:"cpu",price:11990000,rating:4.9,image:"fa-microchip",desc:"CPU 8 lõi với 3D V-Cache, tối ưu cho gaming"},
-{id:4,name:"NVIDIA RTX 4090",category:"gpu",price:49990000,rating:4.9,image:"fa-display",desc:"GPU hàng đầu, 24GB GDDR6X, ray tracing toàn diện"},
-{id:5,name:"NVIDIA RTX 4070 Ti Super",category:"gpu",price:15990000,rating:4.8,image:"fa-display",desc:"16GB GDDR6X, ray tracing thế hệ mới"},
-{id:6,name:"AMD Radeon RX 7900 XTX",category:"gpu",price:21990000,rating:4.7,image:"fa-display",desc:"24GB GDDR6, hiệu năng tối đa cho 4K gaming"},
-{id:7,name:"Corsair Vengeance DDR5 32GB",category:"ram",price:3290000,rating:4.6,image:"fa-memory",desc:"DDR5 6000MHz, CL30, bộ nhớ 32GB (2x16GB)"},
-{id:8,name:"G.Skill Trident Z5 64GB",category:"ram",price:5990000,rating:4.8,image:"fa-memory",desc:"DDR5 6400MHz, RGB, 64GB (2x32GB)"},
-{id:9,name:"Samsung 990 Pro 2TB",category:"storage",price:4290000,rating:4.9,image:"fa-hdd",desc:"SSD NVMe PCIe 4.0, tốc độ đọc lên đến 7450MB/s"},
-{id:10,name:"WD Black SN850X 4TB",category:"storage",price:7990000,rating:4.7,image:"fa-hdd",desc:"SSD NVMe PCIe 4.0, 4TB, tốc độ đọc 7300MB/s"},
-{id:11,name:"Crucial MX500 1TB",category:"storage",price:1590000,rating:4.5,image:"fa-hdd",desc:"SSD SATA 550MB/s, 1TB, bền bỉ và đáng tin cậy"},
-{id:12,name:"Seagate Barracuda 4TB HDD",category:"storage",price:2190000,rating:4.4,image:"fa-hdd",desc:"Ổ cứng HDD 4TB, 7200RPM, lưu trữ dữ liệu lớn"},
-{id:13,name:"Corsair RM1000x",category:"psu",price:3490000,rating:4.8,image:"fa-plug",desc:"Nguồn 1000W, 80 PLUS Gold, mô-đun hoàn toàn"},
-{id:14,name:"EVGA SuperNOVA 850W",category:"psu",price:2490000,rating:4.7,image:"fa-plug",desc:"Nguồn 850W, 80 PLUS Gold, bảo hành 10 năm"},
-{id:15,name:"Seasonic Focus GX-750",category:"psu",price:1990000,rating:4.6,image:"fa-plug",desc:"Nguồn 750W, 80 PLUS Gold, êm ái"},
-{id:16,name:"ASUS ROG Strix B650E-E",category:"mb",price:5990000,rating:4.8,image:"fa-desktop",desc:"Mainboard AM5, DDR5, WiFi 6E, PCIe 5.0"},
-{id:17,name:"MSI Z790 ACE",category:"mb",price:7990000,rating:4.7,image:"fa-desktop",desc:"Mainboard LGA1700, DDR5, PCIe 5.0, WiFi 6E"},
-{id:18,name:"Gigabyte B650 AORUS Elite",category:"mb",price:4290000,rating:4.6,image:"fa-desktop",desc:"Mainboard AM5, DDR5, PCIe 5.0, giá tốt"},
-{id:19,name:"ASUS TUF Gaming VG249Q 23.8\" FHD 144Hz",category:"monitor",price:4290000,rating:4.7,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck19/400/300",brand:"asus",resolution:"1920x1080",refreshRate:144,panel:"IPS",desc:"Màn hình gaming 23.8 inch Full HD, 144Hz, 1ms"},
-{id:20,name:"LG UltraGear 27GR75Q 27\" QHD 165Hz",category:"monitor",price:6990000,rating:4.8,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck20/400/300",brand:"lg",resolution:"2560x1440",refreshRate:165,panel:"IPS",desc:"Màn hình 27 inch 2K QHD, 165Hz, HDR10"},
-{id:21,name:"Samsung Odyssey G5 32\" QHD 165Hz Cong",category:"monitor",price:8490000,discountPrice:7990000,rating:4.7,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck21/400/300",brand:"samsung",resolution:"2560x1440",refreshRate:165,panel:"VA",desc:"Màn hình cong 32 inch 2K, 165Hz, độ cong 1000R"},
-{id:22,name:"Dell UltraSharp U2723QE 27\" 4K",category:"monitor",price:14990000,rating:4.9,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck22/400/300",brand:"dell",resolution:"3840x2160",refreshRate:60,panel:"IPS",desc:"Màn hình đồ họa 27 inch 4K UHD, chuẩn màu 98% DCI-P3"},
-{id:23,name:"MSI Optix MAG274QRF 27\" QHD 165Hz",category:"monitor",price:7490000,rating:4.6,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck23/400/300",brand:"msi",resolution:"2560x1440",refreshRate:165,panel:"IPS",desc:"Màn hình Rapid IPS 27 inch 2K, 165Hz, G-Sync"},
-{id:24,name:"Gigabyte M28U 28\" 4K 144Hz",category:"monitor",price:13990000,discountPrice:12490000,rating:4.8,image:"fa-tv",imageUrl:"https://picsum.photos/seed/pck24/400/300",brand:"gigabyte",resolution:"3840x2160",refreshRate:144,panel:"IPS",desc:"Màn hình 28 inch 4K UHD, 144Hz, HDMI 2.1 cho console"},
-{id:25,name:"ASUS VivoBook 15 i5/16GB/512GB",category:"laptop",price:16990000,rating:4.6,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck25/400/300",brand:"asus",ramGb:16,desc:"Laptop văn phòng 15.6 inch, Core i5, RAM 16GB, SSD 512GB"},
-{id:26,name:"Lenovo Legion 5 RTX 4060/16GB/1TB",category:"laptop",price:32990000,discountPrice:30990000,rating:4.8,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck26/400/300",brand:"lenovo",ramGb:16,desc:"Laptop gaming RTX 4060, RAM 16GB, SSD 1TB, màn 144Hz"},
-{id:27,name:"HP Pavilion 15 R7/16GB/512GB",category:"laptop",price:19490000,rating:4.5,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck27/400/300",brand:"hp",ramGb:16,desc:"Laptop 15.6 inch Ryzen 7, RAM 16GB, pin 8 giờ"},
-{id:28,name:"Dell XPS 13 i7/16GB/512GB",category:"laptop",price:39990000,rating:4.7,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck28/400/300",brand:"dell",ramGb:16,desc:"Ultrabook cao cấp 13.4 inch, Core i7, vỏ nhôm nguyên khối"},
-{id:29,name:"Acer Nitro 5 RTX 4050/8GB/512GB",category:"laptop",price:21990000,discountPrice:20490000,rating:4.6,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck29/400/300",brand:"acer",ramGb:8,desc:"Laptop gaming quốc dân RTX 4050, tản nhiệt kép"},
-{id:30,name:"MSI Katana 15 i7/32GB/1TB",category:"laptop",price:45990000,rating:4.7,image:"fa-laptop",imageUrl:"https://picsum.photos/seed/pck30/400/300",brand:"msi",ramGb:32,desc:"Laptop gaming i7, RAM 32GB, SSD 1TB, bàn phím RGB"}
+{id:1,name:"Tai nghe Bluetooth Sony WH-1000XM4",title:"Chống ồn chủ động, pin 30 giờ",price:5990000,discountPrice:4990000,type:"dien-tu",brand:"sony",imageUrl:"https://picsum.photos/seed/pck101/500/500",rating:4.8,inStock:true},
+{id:2,name:"Bàn phím cơ Logitech G Pro",title:"Switch tactile, đèn RGB",price:2490000,type:"dien-tu",brand:"logitech",imageUrl:"https://picsum.photos/seed/pck102/500/500",rating:4.7,inStock:true},
+{id:3,name:"Chuột gaming Razer DeathAdder",title:"6400 DPI, siêu nhẹ 69g",price:1290000,discountPrice:990000,type:"dien-tu",brand:"razer",imageUrl:"https://picsum.photos/seed/pck103/500/500",rating:4.6,inStock:true},
+{id:4,name:"Loa Bluetooth JBL Flip 6",title:"Chống nước IP67, pin 12 giờ",price:2990000,type:"dien-tu",brand:"jbl",imageUrl:"https://picsum.photos/seed/pck104/500/500",rating:4.7,inStock:true},
+{id:5,name:"Sạc dự phòng Anker 20000mAh",title:"Sạc nhanh 22.5W, 2 cổng",price:890000,type:"dien-tu",brand:"anker",imageUrl:"https://picsum.photos/seed/pck105/500/500",rating:4.6,inStock:true},
+{id:6,name:"Đồng hồ thông minh Apple Watch SE",title:"GPS, đo nhịp tim, chống nước",price:5990000,discountPrice:5490000,type:"dien-tu",brand:"apple",imageUrl:"https://picsum.photos/seed/pck106/500/500",rating:4.8,inStock:true},
+{id:7,name:"Serum Vitamin C La Roche",title:"Sáng da, mờ thâm, 30ml",price:620000,type:"my-pham",brand:"laroche",imageUrl:"https://picsum.photos/seed/pck107/500/500",rating:4.7,inStock:true},
+{id:8,name:"Kem dưỡng ẩm CeraVe",title:"Cho da khô, hũ 454g",price:450000,discountPrice:389000,type:"my-pham",brand:"cerave",imageUrl:"https://picsum.photos/seed/pck108/500/500",rating:4.8,inStock:true},
+{id:9,name:"Sữa rửa mặt Innisfree Green Tea",title:"Làm sạch dịu nhẹ, 150ml",price:280000,type:"my-pham",brand:"innisfree",imageUrl:"https://picsum.photos/seed/pck109/500/500",rating:4.6,inStock:true},
+{id:10,name:"Kem chống nắng L'Oreal SPF50",title:"Kiềm dầu, không nhờn rít, 50ml",price:350000,type:"my-pham",brand:"loreal",imageUrl:"https://picsum.photos/seed/pck110/500/500",rating:4.5,inStock:true},
+{id:11,name:"Mặt nạ đất sét Kiehl's",title:"Se khít lỗ chân lông, 125ml",price:890000,type:"my-pham",brand:"kiehls",imageUrl:"https://picsum.photos/seed/pck111/500/500",rating:4.7,inStock:true},
+{id:12,name:"Nồi chiên không dầu Philips 6.2L",title:"Chiên nướng không dầu mỡ",price:3290000,discountPrice:2790000,type:"gia-dung",brand:"philips",imageUrl:"https://picsum.photos/seed/pck112/500/500",rating:4.8,inStock:true},
+{id:13,name:"Máy xay sinh tố Panasonic",title:"Cối thủy tinh 1.5L, 400W",price:1190000,type:"gia-dung",brand:"panasonic",imageUrl:"https://picsum.photos/seed/pck113/500/500",rating:4.5,inStock:true},
+{id:14,name:"Robot hút bụi Xiaomi",title:"Lực hút 4000Pa, lau nhà",price:4990000,type:"gia-dung",brand:"xiaomi",imageUrl:"https://picsum.photos/seed/pck114/500/500",rating:4.6,inStock:true},
+{id:15,name:"Áo thun cotton basic",title:"100% cotton, nhiều màu",price:199000,type:"thoi-trang",brand:"pck",imageUrl:"https://picsum.photos/seed/pck115/500/500",rating:4.4,inStock:true},
+{id:16,name:"Giày sneaker thể thao",title:"Đế êm, thoáng khí",price:799000,discountPrice:649000,type:"thoi-trang",brand:"pck",imageUrl:"https://picsum.photos/seed/pck116/500/500",rating:4.6,inStock:true}
 ];
 
-var CATEGORY_NAMES = {cpu:'CPU',gpu:'GPU',ram:'RAM',storage:'Lưu trữ',psu:'Nguồn',mb:'Mainboard',monitor:'Màn hình',laptop:'Laptop'};
-var CATEGORY_ICONS = {cpu:'fa-microchip',gpu:'fa-display',ram:'fa-memory',storage:'fa-hdd',psu:'fa-plug',mb:'fa-desktop',monitor:'fa-tv',laptop:'fa-laptop'};
-
-// Top-level groups for the "Danh mục sản phẩm" menu.
-var GROUPS = {
-  components: { name: 'Linh kiện máy tính', cats: ['cpu','gpu','ram','storage','psu','mb'] },
-  monitor: { name: 'Màn hình máy tính', cats: ['monitor'] },
-  laptop: { name: 'Laptop', cats: ['laptop'] }
+var TYPE_NAMES = {
+  'dien-tu': 'Đồ điện tử',
+  'my-pham': 'Mỹ phẩm',
+  'gia-dung': 'Gia dụng',
+  'thoi-trang': 'Thời trang'
 };
 
-var BRAND_NAMES = {asus:'ASUS',lg:'LG',samsung:'Samsung',dell:'Dell',msi:'MSI',gigabyte:'Gigabyte',lenovo:'Lenovo',hp:'HP',acer:'Acer',logitech:'Logitech',razer:'Razer',rog:'ROG',corsair:'Corsair',hyperx:'HyperX',apple:'Apple'};
+var BRAND_NAMES = {sony:'Sony',logitech:'Logitech',razer:'Razer',jbl:'JBL',anker:'Anker',apple:'Apple',laroche:'La Roche',cerave:'CeraVe',innisfree:'Innisfree',loreal:"L'Oreal",kiehls:"Kiehl's",philips:'Philips',panasonic:'Panasonic',xiaomi:'Xiaomi',pck:'PCKongKun',asus:'ASUS',lg:'LG',samsung:'Samsung',dell:'Dell',msi:'MSI',gigabyte:'Gigabyte',lenovo:'Lenovo',hp:'HP',acer:'Acer',rog:'ROG',corsair:'Corsair',hyperx:'HyperX'};
 
-var RESOLUTION_NAMES = {'1920x1080':'Full HD','2560x1440':'2K QHD','3840x2160':'4K UHD'};
-
-function getCategoryName(cat) {
-  return CATEGORY_NAMES[cat] || cat;
+function getTypeName(type) {
+  if (!type) return '';
+  if (TYPE_NAMES[type]) return TYPE_NAMES[type];
+  return String(type).replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
 }
 
 function getBrandName(brand) {
   if (!brand) return '';
   var k = String(brand).toLowerCase();
   return BRAND_NAMES[k] || brand;
-}
-
-function getResolutionName(res) {
-  if (!res) return '';
-  return RESOLUTION_NAMES[res] || res;
-}
-
-function groupNameOf(cat) {
-  for (var g in GROUPS) {
-    if (GROUPS[g].cats.indexOf(cat) !== -1) return GROUPS[g].name;
-  }
-  return '';
 }
 
 // Effective selling price (discount applied when valid).
@@ -85,19 +56,8 @@ function discountPct(p) {
   return Math.round((1 - d / price) * 100);
 }
 
-// Compact VND: 200000000 -> "200 triệu", 15500000 -> "15.5 triệu".
-function fmtCompact(n) {
-  n = Number(n) || 0;
-  if (n >= 1000000000) {
-    var b = n / 1000000000;
-    return (Math.round(b * 10) / 10) + ' tỷ';
-  }
-  if (n >= 1000000) {
-    var m = n / 1000000;
-    return (Math.round(m * 10) / 10) + ' triệu';
-  }
-  if (n >= 1000) return Math.round(n / 1000) + ' nghìn';
-  return String(n);
+function inStock(p) {
+  return p.inStock !== false;
 }
 
 // Price brackets for the collection filter bar (VND).
@@ -110,29 +70,11 @@ var PRICE_BRACKETS = [
   { id: 'p6', label: 'Trên 50 triệu', min: 50000000, max: Infinity }
 ];
 
-function inStock(p) {
-  return p.inStock !== false;
-}
-
-function matchBracket(p, sel) {
-  if (!sel || !sel.length) return true;
-  var price = effPrice(p);
-  for (var i = 0; i < PRICE_BRACKETS.length; i++) {
-    var b = PRICE_BRACKETS[i];
-    if (sel.indexOf(b.id) !== -1 && price >= b.min && price < b.max) return true;
-  }
-  return false;
-}
-
-function matchMulti(p, field, sel) {
-  if (!sel || !sel.length) return true;
-  return sel.indexOf(String(p[field] == null ? '' : p[field]).toLowerCase()) !== -1;
-}
-function distinctValues(products, groupKey, field) {
+// Distinct values of a field (for dynamic filter options).
+function distinctValues(products, field) {
   var seen = {};
   var out = [];
   products.forEach(function (p) {
-    if (GROUPS[groupKey].cats.indexOf(p.category) === -1) return;
     var v = p[field];
     if (v === undefined || v === null || v === '') return;
     var k = String(v);
@@ -143,6 +85,19 @@ function distinctValues(products, groupKey, field) {
     if (!isNaN(na) && !isNaN(nb)) return na - nb;
     return String(a).localeCompare(String(b));
   });
+  return out;
+}
+
+function distinctTypes(products) {
+  var seen = {};
+  var out = [];
+  products.forEach(function (p) {
+    var t = p.type || '';
+    if (!t || seen[t]) return;
+    seen[t] = 1;
+    out.push(t);
+  });
+  out.sort();
   return out;
 }
 
