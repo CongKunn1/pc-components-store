@@ -686,11 +686,6 @@ h1, h2, h3, .logo, .hero-text h1 {
   .hero-text h1 { font-size: 2.4rem; }
   .stat-cards { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 1279px) {
-  .main-nav { display: none; }
-  .hamburger { display: inline-flex; }
-  .filter-row { display: none; }
-}
 @media (max-width: 768px) {
   .foot-grid { grid-template-columns: 1fr; }
   .admin-toolbar { flex-direction: column; align-items: stretch; }
@@ -989,4 +984,11 @@ body.side-locked { overflow: hidden; }
   .modal-box { padding: 20px; }
   .login-box { padding: 28px 22px; }
   .admin-bar-inner { flex-wrap: wrap; }
+}
+
+/* Sub-1280px layout MUST come last so it overrides base rules */
+@media (max-width: 1279px) {
+  .main-nav { display: none; }
+  .hamburger { display: inline-flex; }
+  .filter-row { display: none; }
 }

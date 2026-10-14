@@ -352,6 +352,9 @@ var CursorFX = (function () {
     canvas.id = 'cursor-fx';
     try { ctx = canvas.getContext('2d'); } catch (e) { ctx = null; }
     if (!ctx) { canvas = null; return false; }
+    if (document.body && document.body.appendChild) {
+      try { document.body.appendChild(canvas); } catch (e) { canvas = null; return false; }
+    } else { canvas = null; return false; }
     resize();
     window.addEventListener('resize', resize);
     document.addEventListener('pointermove', onMove, { passive: true });
