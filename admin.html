@@ -87,10 +87,11 @@
 <input type="number" id="fPrice" min="0" step="1000" placeholder="VD: 1290000">
 <label>Giá khuyến mãi (để trống = không giảm)</label>
 <input type="number" id="fDiscount" min="0" step="1000" placeholder="VD: 990000">
-<label>Loại * (VD: dien-tu, my-pham, gia-dung, thoi-trang...)</label>
-<input type="text" id="fType" list="typeList" placeholder="VD: dien-tu">
-<datalist id="typeList"></datalist>
-<label>Ảnh sản phẩm — chọn từ máy, kéo thả, hoặc paste ảnh đã copy (Ctrl+V)</label>
+<label>Loại *</label>
+<select id="fTypeSel" onchange="onTypeSel(this)"></select>
+<input type="text" id="fTypeNew" style="display:none;margin-top:8px" placeholder="Nhập loại mới (vd: do-choi)">
+<input type="hidden" id="fType">
+<label>Ảnh sản phẩm</label>
 <div class="dropzone" id="dropzone" onclick="document.getElementById('fFile').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="onDropImage(event)">
 <i class="fas fa-cloud-arrow-up"></i>
 <p>Bấm để chọn ảnh, kéo thả file vào đây, hoặc paste ảnh đã copy</p>
@@ -99,7 +100,27 @@
 <div class="preview-row" id="previewRow" style="display:none">
 <img id="fPreview" alt="preview">
 <div class="preview-info"><p id="fPreviewName"></p><p id="fUploadStatus"></p>
-<button type="button" class="btn btn-ghost" onclick="clearPendingImage()">Gỡ ảnh</button></div>
+<div class="preview-btns">
+<button type="button" class="btn btn-ghost" onclick="openCrop()"><i class="fas fa-crop"></i> Cắt ảnh</button>
+<button type="button" class="btn btn-ghost" onclick="clearPendingImage()">Gỡ ảnh</button>
+</div></div>
+</div>
+
+<!-- Crop editor -->
+<div id="cropModal" class="modal" style="display:none">
+<div class="modal-box">
+<h2><i class="fas fa-crop"></i> Cắt ảnh (vuông)</h2>
+<div class="crop-stage" id="cropStage">
+<img id="cropImg" alt="" draggable="false">
+<div class="crop-box" id="cropBox"></div>
+</div>
+<label>Phóng to <input type="range" id="cropZoom" min="1" max="3" step="0.05" value="1" oninput="applyCropZoom()"></label>
+<p id="cropHint">Kéo khung vuông để chọn vùng cắt, dùng thanh trượt để phóng to.</p>
+<div class="modal-actions">
+<button class="btn btn-ghost" onclick="closeCrop()">Hủy</button>
+<button class="btn" onclick="applyCrop()"><i class="fas fa-check"></i> Xong</button>
+</div>
+</div>
 </div>
 <label>Link Shopee *</label>
 <input type="text" id="fShopee" placeholder="VD: https://shopee.vn/...">
@@ -303,14 +324,31 @@ function escapeHtml(s) {
 var pendingImageUrl = '';
 
 function fillDatalists() {
-  var all = loadProducts().concat(cachedProducts);
-  var types = {};
-  all.forEach(function (p) {
-    if (p.type) types[p.type] = 1;
+  fillTypeSelect('');
+}
+
+function fillTypeSelect(current) {
+  var set = {};
+  loadProducts().concat(cachedProducts).forEach(function (p) {
+    if (p.type) set[p.type] = 1;
   });
-  document.getElementById('typeList').innerHTML = Object.keys(types).sort().map(function (t) {
-    return '<option value="' + t + '">' + escapeHtml(getTypeName(t)) + '</option>';
-  }).join('');
+  if (current) set[current] = 1;
+  var types = Object.keys(set).sort();
+  var sel = document.getElementById('fTypeSel');
+  sel.innerHTML = types.map(function (t) {
+    return '<option value="' + t + '"' + (t === current ? ' selected' : '') + '>' +
+      escapeHtml(getTypeName(t)) + ' (' + t + ')</option>';
+  }).join('') + '<option value="__new__">＋ Thêm loại mới...</option>';
+  var isNew = !current || types.indexOf(current) === -1;
+  if (!current && types.length) { sel.value = types[0]; }
+  onTypeSel(sel);
+}
+
+function onTypeSel(sel) {
+  var isNew = sel.value === '__new__';
+  document.getElementById('fTypeNew').style.display = isNew ? '' : 'none';
+  document.getElementById('fType').value = isNew ? '' : sel.value;
+  if (isNew) document.getElementById('fTypeNew').focus();
 }
 
 function setUploadStatus(msg) {
@@ -335,6 +373,7 @@ function renderPreview(name) {
 
 function clearPendingImage() {
   pendingImageUrl = '';
+  cropFile = null;
   document.getElementById('fFile').value = '';
   renderPreview();
 }
@@ -343,6 +382,7 @@ function handleImageFile(file) {
   if (!file) return;
   if ((file.type || '').indexOf('image/') !== 0) { setUploadStatus('File không phải ảnh!'); return; }
   if (file.size > 5 * 1024 * 1024) { setUploadStatus('Ảnh tối đa 5MB!'); return; }
+  cropFile = file;
   try {
     document.getElementById('fPreview').src = URL.createObjectURL(file);
     document.getElementById('previewRow').style.display = 'flex';
@@ -408,6 +448,96 @@ function onPasteImage(e) {
   }
 }
 
+// ---------- Crop editor (square crop, drag + zoom) ----------
+var cropFile = null;
+var cropState = { x: 0, y: 0, size: 200 };
+
+function openCrop() {
+  var img = document.getElementById('cropImg');
+  var done = function () { initCropBox(); document.getElementById('cropModal').style.display = 'flex'; };
+  img.onload = done;
+  img.onerror = function () { alert('Không tải được ảnh để cắt. Hãy chọn lại file ảnh từ máy.'); };
+  if (cropFile) {
+    img.removeAttribute('crossorigin');
+    img.src = URL.createObjectURL(cropFile);
+  } else if (pendingImageUrl) {
+    img.setAttribute('crossorigin', 'anonymous');
+    img.src = imgSrc(pendingImageUrl);
+  } else {
+    alert('Chưa có ảnh để cắt!');
+  }
+}
+
+function closeCrop() {
+  document.getElementById('cropModal').style.display = 'none';
+}
+
+function cropImageRect() {
+  var stage = document.getElementById('cropStage');
+  var img = document.getElementById('cropImg');
+  return { sw: stage.clientWidth, sh: stage.clientHeight, iw: img.clientWidth, ih: img.clientHeight };
+}
+
+function setBoxPos(x, y) {
+  var r = cropImageRect();
+  var s = cropState.size;
+  cropState.x = Math.max(0, Math.min(x, r.sw - s));
+  cropState.y = Math.max(0, Math.min(y, Math.min(r.ih, r.sh) - s));
+  if (cropState.y < 0) cropState.y = 0;
+  var box = document.getElementById('cropBox');
+  box.style.left = cropState.x + 'px';
+  box.style.top = cropState.y + 'px';
+  box.style.width = s + 'px';
+  box.style.height = s + 'px';
+}
+
+function initCropBox() {
+  var box = document.getElementById('cropBox');
+  var r = cropImageRect();
+  cropState.size = Math.max(60, Math.floor(Math.min(r.sw, Math.min(r.ih, r.sh)) * 0.85));
+  setBoxPos(Math.floor((r.sw - cropState.size) / 2), 0);
+  box.onpointerdown = function (e) {
+    e.preventDefault();
+    var sx = e.clientX, sy = e.clientY;
+    var ox = cropState.x, oy = cropState.y;
+    var mv = function (ev) { setBoxPos(ox + ev.clientX - sx, oy + ev.clientY - sy); };
+    var up = function () {
+      window.removeEventListener('pointermove', mv);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', mv);
+    window.addEventListener('pointerup', up);
+  };
+}
+
+function applyCropZoom() {
+  var z = Number(document.getElementById('cropZoom').value) || 1;
+  document.getElementById('cropImg').style.width = (z * 100) + '%';
+  setTimeout(function () { setBoxPos(cropState.x, cropState.y); }, 30);
+}
+
+function applyCrop() {
+  var img = document.getElementById('cropImg');
+  if (!img.clientWidth || !img.naturalWidth) { alert('Ảnh chưa tải xong!'); return; }
+  var scale = img.naturalWidth / img.clientWidth;
+  var s = Math.round(cropState.size * scale);
+  var sx = Math.round(cropState.x * scale);
+  var sy = Math.round(cropState.y * scale);
+  var out = Math.max(100, Math.min(1000, s));
+  var cv = document.createElement('canvas');
+  cv.width = out; cv.height = out;
+  try {
+    cv.getContext('2d').drawImage(img, sx, sy, s, s, 0, 0, out, out);
+  } catch (e) { alert('Không cắt được ảnh này. Hãy chọn lại file ảnh từ máy.'); return; }
+  cv.toBlob(function (blob) {
+    if (!blob) { alert('Cắt ảnh thất bại (ảnh có thể bị chặn CORS). Hãy chọn lại file từ máy.'); return; }
+    closeCrop();
+    document.getElementById('cropZoom').value = 1;
+    document.getElementById('cropImg').style.width = '100%';
+    handleImageFile(new File([blob], 'crop.jpg', { type: 'image/jpeg' }));
+  }, 'image/jpeg', 0.92);
+}
+
 function openModal(id) {
   document.getElementById('formError').textContent = '';
   if (id == null) {
@@ -417,13 +547,14 @@ function openModal(id) {
     document.getElementById('fTitle').value = '';
     document.getElementById('fPrice').value = '';
     document.getElementById('fDiscount').value = '';
-    document.getElementById('fType').value = '';
     document.getElementById('fShopee').value = '';
     pendingImageUrl = '';
     renderPreview('');
+    cropFile = null;
     document.getElementById('fRating').value = '4.5';
     document.getElementById('fStock').checked = true;
-    fillDatalists();
+    fillTypeSelect('');
+    document.getElementById('fTypeNew').value = '';
   } else {
     var p = cachedProducts.find(function (x) { return x.id === id; });
     if (!p) return;
@@ -433,13 +564,14 @@ function openModal(id) {
     document.getElementById('fTitle').value = p.title || '';
     document.getElementById('fPrice').value = p.price;
     document.getElementById('fDiscount').value = p.discountPrice || '';
-    document.getElementById('fType').value = p.type || '';
     document.getElementById('fShopee').value = p.shopeeUrl || '';
     pendingImageUrl = p.imageUrl || '';
     renderPreview(p.name);
+    cropFile = null;
     document.getElementById('fRating').value = p.rating;
     document.getElementById('fStock').checked = p.inStock !== false;
-    fillDatalists();
+    fillTypeSelect(p.type || '');
+    document.getElementById('fTypeNew').value = '';
   }
   document.getElementById('productModal').style.display = 'flex';
 }
@@ -455,7 +587,7 @@ function readForm() {
   var price = Number(document.getElementById('fPrice').value);
   var discRaw = document.getElementById('fDiscount').value.trim();
   var discount = discRaw === '' ? null : Number(discRaw);
-  var type = document.getElementById('fType').value.trim().toLowerCase().replace(/\s+/g, '-');
+  var type = readType();
   var shopee = document.getElementById('fShopee').value.trim();
   var rating = Number(document.getElementById('fRating').value);
   var stock = document.getElementById('fStock').checked;
@@ -467,6 +599,14 @@ function readForm() {
   if (shopee && shopee.indexOf('http') !== 0) { err.textContent = 'Link Shopee phải bắt đầu bằng http!'; return null; }
   return { name: name, title: title, price: price, discountPrice: discount, type: type,
     brand: '', imageUrl: pendingImageUrl, shopeeUrl: shopee, rating: rating, inStock: stock };
+}
+
+function readType() {
+  var sel = document.getElementById('fTypeSel').value;
+  if (sel === '__new__') {
+    return document.getElementById('fTypeNew').value.trim().toLowerCase().replace(/\s+/g, '-');
+  }
+  return sel;
 }
 
 function saveProduct() {
