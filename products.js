@@ -252,10 +252,26 @@ var CursorFX = (function () {
 
   function fxForced() {
     try {
-      if (typeof window !== 'undefined' && window.location && window.location.search &&
-          window.location.search.indexOf('fx=1') !== -1) return true;
-    } catch (e) {}
+      if (typeof window !== 'undefined' && window.location && typeof window.location.search === 'string') {
+        var s = window.location.search;
+        if (s.indexOf('fx=1') !== -1) {
+          try { if (typeof localStorage !== 'undefined') localStorage.setItem('pck_fx', '1'); } catch (e) {}
+          return true;
+        }
+        if (s.indexOf('fx=0') !== -1) {
+          try { if (typeof localStorage !== 'undefined') localStorage.removeItem('pck_fx'); } catch (e2) {}
+          return false;
+        }
+      }
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('pck_fx') === '1') return true;
+    } catch (e3) {}
     return false;
+  }
+
+  function hasFinePointer() {
+    try {
+      return !!(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
+    } catch (e) { return false; }
   }
   var COLORS_LIGHT = ['#ff8c42', '#ff6b4a', '#e05b3a', '#ffb03a'];
   var COLORS_DARK = ['#ffd97a', '#ffb37e', '#fff3d6', '#ff9d7e'];
@@ -274,7 +290,9 @@ var CursorFX = (function () {
     if (!fxForced()) {
       try {
         if (window.matchMedia) {
-          if (window.matchMedia('(pointer: coarse)').matches) { diagReason = 'coarse-pointer'; return false; }
+          // Touch-only devices (phones/tablets) skip the effect,
+          // but touchscreen LAPTOPS (coarse + fine) still get it.
+          if (window.matchMedia('(pointer: coarse)').matches && !hasFinePointer()) { diagReason = 'coarse-pointer'; return false; }
           if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { diagReason = 'reduced-motion'; return false; }
         }
       } catch (e) {}
