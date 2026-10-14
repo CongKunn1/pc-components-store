@@ -696,6 +696,15 @@ h1, h2, h3, .logo, .hero-text h1 {
   .admin-toolbar { flex-direction: column; align-items: stretch; }
   .table-wrap { overflow-x: auto; }
   .admin-table { min-width: 680px; }
+  .stats { flex-wrap: wrap; gap: 20px; justify-content: center; }
+  .stat-item { min-width: 90px; }
+  .stat-item h3 { font-size: 1.5rem; }
+}
+@media (max-width: 380px) {
+  .header-inner { gap: 8px; padding: 12px 12px; }
+  .logo { font-size: 1.15rem; letter-spacing: 1px; }
+  .icon-btn, .hamburger { width: 36px; height: 36px; font-size: 0.85rem; }
+  .header-icons { gap: 7px; }
 }
 
 html, body { overflow-x: clip; }
@@ -972,7 +981,7 @@ body.side-locked { overflow: hidden; }
   .hero-text h1 { font-size: 2rem; }
   .hero-art { height: 190px; }
   .card-body { padding: 12px 13px 15px; }
-  .card-body h3 { font-size: 0.88rem; }
+  .card-body h3 { font-size: 0.88rem; overflow-wrap: anywhere; }
   .card-sub { font-size: 0.75rem; }
   .price b { font-size: 0.92rem; }
   .badge { font-size: 0.66rem; padding: 3px 9px; top: 8px; left: 8px; }

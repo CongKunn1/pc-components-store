@@ -247,7 +247,16 @@ var CursorFX = (function () {
   var canvas = null, ctx = null, parts = [];
   var running = false, lastX = -9999, lastY = -9999, lastT = 0;
   var MAX = 130;
-  var COLORS = ['#ffd97a', '#ffb37e', '#fff3d6', '#ff9d7e'];
+  var COLORS_LIGHT = ['#ff8c42', '#ff6b4a', '#e05b3a', '#ffb03a'];
+  var COLORS_DARK = ['#ffd97a', '#ffb37e', '#fff3d6', '#ff9d7e'];
+
+  function palette() {
+    try {
+      if (typeof document !== 'undefined' && document.documentElement &&
+          document.documentElement.getAttribute('data-theme') === 'dark') return COLORS_DARK;
+    } catch (e) {}
+    return COLORS_LIGHT;
+  }
 
   function canInit() {
     if (typeof window === 'undefined' || typeof document === 'undefined') return false;
@@ -269,6 +278,7 @@ var CursorFX = (function () {
 
   function spawn(x, y, burst) {
     var n = burst ? 3 : 2;
+    var pal = palette();
     for (var i = 0; i < n; i++) {
       if (parts.length >= MAX) parts.shift();
       var a = Math.random() * Math.PI * 2;
@@ -277,8 +287,8 @@ var CursorFX = (function () {
         x: x, y: y, px: x, py: y,
         vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.4,
         life: 1, decay: 0.02 + Math.random() * 0.03,
-        size: 1 + Math.random() * 2.2,
-        color: COLORS[(Math.random() * COLORS.length) | 0],
+        size: 1.2 + Math.random() * 2.4,
+        color: pal[(Math.random() * pal.length) | 0],
         tw: Math.random() * Math.PI * 2
       });
     }
@@ -297,6 +307,8 @@ var CursorFX = (function () {
       if (p.life <= 0) { parts.splice(i, 1); continue; }
       var tw = 0.55 + 0.45 * Math.sin(p.tw);
       var alpha = Math.max(0, p.life) * tw;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = p.color;
       ctx.strokeStyle = p.color;
       ctx.globalAlpha = alpha * 0.7;
       ctx.lineWidth = p.size * 0.7;
@@ -307,6 +319,10 @@ var CursorFX = (function () {
       ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill();
       ctx.globalAlpha = alpha * 0.35;
       ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 2.6, 0, 6.2832); ctx.fill();
+      ctx.globalAlpha = Math.min(1, alpha + 0.2);
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.8, p.size * 0.45), 0, 6.2832); ctx.fill();
+      ctx.shadowBlur = 0;
     }
     ctx.globalAlpha = 1;
     window.requestAnimationFrame(frame);

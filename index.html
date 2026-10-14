@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>try{var t=localStorage.getItem('pck_theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <title>PCKongKun — Cửa hàng tổng hợp</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -53,7 +53,7 @@
 </div>
 <div class="search-bar" id="searchBar" style="display:none">
 <i class="fas fa-search"></i>
-<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm, hãng..." oninput="onSearch(this.value)">
+<input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm..." oninput="onSearch(this.value)">
 </div>
 </header>
 
@@ -100,8 +100,8 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="config.js"></script>
-<script src="products.js"></script>
+<script src="config.js?v=3"></script>
+<script src="products.js?v=3"></script>
 <script>
 var products = [];
 var currentType = 'all';
