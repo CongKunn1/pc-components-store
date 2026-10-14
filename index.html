@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>try{var t=localStorage.getItem('pck_theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <title>PCKongKun — Cửa hàng tổng hợp</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +15,7 @@
 
 <header class="site-header">
 <div class="header-inner">
+<button class="hamburger" onclick="toggleMobileNav(event)" title="Menu"><i class="fas fa-bars"></i></button>
 <a class="logo" href="#" onclick="goHome();return false;">PCKongKun</a>
 <nav class="main-nav">
 <a href="#" onclick="goHome();return false;">Trang chủ</a>
@@ -24,6 +26,7 @@
 <a href="#contact">Liên hệ</a>
 </nav>
 <div class="header-icons">
+<button class="icon-btn theme-btn" onclick="toggleTheme()" title="Giao diện sáng / tối"><span class="theme-icon icon-moon"><i class="fas fa-moon"></i></span><span class="theme-icon icon-sun"><i class="fas fa-sun"></i></span></button>
 <button class="icon-btn" onclick="toggleSearch()" title="Tìm kiếm"><i class="fas fa-search"></i></button>
 <button class="icon-btn admin-link" onclick="location.href='admin.html'" title="Quản trị"><i class="fas fa-user-gear"></i></button>
 </div>
@@ -31,6 +34,12 @@
 <div class="search-bar" id="searchBar" style="display:none">
 <i class="fas fa-search"></i>
 <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm, hãng..." oninput="onSearch(this.value)">
+</div>
+<div class="mobile-nav" id="mobileNav">
+<a href="#" onclick="goHome();return false;">Trang chủ</a>
+<a href="#contact" onclick="closeMobileNav()">Liên hệ</a>
+<a href="admin.html">Quản trị</a>
+<div class="m-types" id="mTypes"></div>
 </div>
 </header>
 
@@ -121,9 +130,18 @@ function toggleNavTypes(e) {
   if (e) e.stopPropagation();
   document.getElementById('navTypes').classList.toggle('show');
 }
+function toggleMobileNav(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('mobileNav').classList.toggle('show');
+}
+function closeMobileNav() {
+  var m = document.getElementById('mobileNav');
+  if (m) m.classList.remove('show');
+}
 document.addEventListener('click', function () {
   var n = document.getElementById('navTypes');
   if (n) n.classList.remove('show');
+  closeMobileNav();
   if (openDrop !== null) { openDrop = null; buildFilters(); }
 });
 function onSearch(v) { currentQuery = v.trim(); renderAll(); }
@@ -225,6 +243,7 @@ function sortLabel() {
 }
 function pickType(t) {
   currentType = t;
+  closeMobileNav();
   renderAll();
 }
 
@@ -293,6 +312,10 @@ function buildNavTypes() {
   var foot = document.getElementById('footTypes');
   if (foot) foot.innerHTML = types.map(function (t) {
     return '<a href="#" onclick="pickType(\'' + t + '\');return false;">' + esc(getTypeName(t)) + '</a>';
+  }).join('');
+  var mob = document.getElementById('mTypes');
+  if (mob) mob.innerHTML = types.map(function (t) {
+    return '<button onclick="pickType(\'' + t + '\');closeMobileNav();">' + esc(getTypeName(t)) + '</button>';
   }).join('');
 }
 

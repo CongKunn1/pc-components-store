@@ -207,3 +207,169 @@ function googleLoginApi(idToken) {
     });
   });
 }
+
+// ---------- Theme (light / dark) ----------
+var THEME_KEY = 'pck_theme';
+
+function getTheme() {
+  try {
+    var t = localStorage.getItem(THEME_KEY);
+    if (t === 'dark' || t === 'light') return t;
+    if (typeof window !== 'undefined' && window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+  } catch (e) {}
+  return 'light';
+}
+
+function applyTheme(t) {
+  if (t !== 'dark' && t !== 'light') t = 'light';
+  try {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', t);
+      var btns = document.querySelectorAll ? document.querySelectorAll('.theme-btn') : [];
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove('spinning');
+        void btns[i].offsetWidth;
+        btns[i].classList.add('spinning');
+      }
+    }
+    if (typeof localStorage !== 'undefined') localStorage.setItem(THEME_KEY, t);
+  } catch (e) {}
+  starBurst();
+}
+
+function toggleTheme() {
+  applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
+}
+
+// ---------- Shooting-star cursor trail ----------
+var CursorFX = (function () {
+  var canvas = null, ctx = null, parts = [];
+  var running = false, lastX = -9999, lastY = -9999, lastT = 0;
+  var MAX = 130;
+  var COLORS = ['#ffd97a', '#ffb37e', '#fff3d6', '#ff9d7e'];
+
+  function canInit() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+    if (!window.requestAnimationFrame) return false;
+    try {
+      if (window.matchMedia) {
+        if (window.matchMedia('(pointer: coarse)').matches) return false;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+      }
+    } catch (e) {}
+    return true;
+  }
+
+  function resize() {
+    if (!canvas) return;
+    canvas.width = window.innerWidth || 800;
+    canvas.height = window.innerHeight || 600;
+  }
+
+  function spawn(x, y, burst) {
+    var n = burst ? 3 : 2;
+    for (var i = 0; i < n; i++) {
+      if (parts.length >= MAX) parts.shift();
+      var a = Math.random() * Math.PI * 2;
+      var sp = burst ? 1 + Math.random() * 3 : 0.3 + Math.random() * 1.2;
+      parts.push({
+        x: x, y: y, px: x, py: y,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.4,
+        life: 1, decay: 0.02 + Math.random() * 0.03,
+        size: 1 + Math.random() * 2.2,
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        tw: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function frame() {
+    if (!running) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i];
+      p.px = p.x; p.py = p.y;
+      p.x += p.vx; p.y += p.vy;
+      p.vy += 0.03; p.vx *= 0.985;
+      p.life -= p.decay;
+      p.tw += 0.25;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      var tw = 0.55 + 0.45 * Math.sin(p.tw);
+      var alpha = Math.max(0, p.life) * tw;
+      ctx.strokeStyle = p.color;
+      ctx.globalAlpha = alpha * 0.7;
+      ctx.lineWidth = p.size * 0.7;
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); ctx.stroke();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill();
+      ctx.globalAlpha = alpha * 0.35;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 2.6, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    window.requestAnimationFrame(frame);
+  }
+
+  function now() {
+    try {
+      if (window.performance && window.performance.now) return window.performance.now();
+    } catch (e) {}
+    return Date.now();
+  }
+
+  function onMove(e) {
+    var t = now();
+    if (t - lastT < 18) return;
+    lastT = t;
+    var dx = e.clientX - lastX, dy = e.clientY - lastY;
+    if (lastX > -9999 && dx * dx + dy * dy < 9) return;
+    lastX = e.clientX; lastY = e.clientY;
+    spawn(e.clientX, e.clientY, false);
+  }
+
+  function init() {
+    if (canvas || !canInit()) return false;
+    canvas = document.createElement('canvas');
+    if (!canvas) return false;
+    canvas.id = 'cursor-fx';
+    try { ctx = canvas.getContext('2d'); } catch (e) { ctx = null; }
+    if (!ctx) { canvas = null; return false; }
+    resize();
+    window.addEventListener('resize', resize);
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('click', function (e) { spawn(e.clientX, e.clientY, true); });
+    if (document.addEventListener) {
+      document.addEventListener('visibilitychange', function () {
+        running = !document.hidden;
+        if (running) window.requestAnimationFrame(frame);
+      });
+    }
+    running = true;
+    window.requestAnimationFrame(frame);
+    return true;
+  }
+
+  function burst(x, y) {
+    if (!canvas || !ctx) return false;
+    var cx = (typeof x === 'number') ? x : (window.innerWidth || 800) / 2;
+    var cy = (typeof y === 'number') ? y : (window.innerHeight || 600) * 0.3;
+    for (var i = 0; i < 9; i++) spawn(cx, cy, true);
+    return true;
+  }
+
+  return { init: init, burst: burst, _count: function () { return parts.length; } };
+})();
+
+function starBurst() {
+  try { CursorFX.burst(); } catch (e) {}
+}
+
+if (typeof document !== 'undefined' && document.addEventListener) {
+  if (document.readyState === 'loading' && document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', function () { CursorFX.init(); });
+  } else {
+    CursorFX.init();
+  }
+}

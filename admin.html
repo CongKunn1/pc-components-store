@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>try{var t=localStorage.getItem('pck_theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <title>Quản Trị - PCKongKun</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -35,6 +36,7 @@
 <span class="admin-tag">Admin</span>
 <nav>
 <a href="index.html"><i class="fas fa-store"></i> Xem cửa hàng</a>
+<button class="icon-btn theme-btn" onclick="toggleTheme()" title="Giao diện sáng / tối" style="width:34px;height:34px;font-size:0.85rem"><span class="theme-icon icon-moon"><i class="fas fa-moon"></i></span><span class="theme-icon icon-sun"><i class="fas fa-sun"></i></span></button>
 <span id="userChip" class="user-chip"></span>
 <a href="#" onclick="doLogout();return false"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
 </nav>
