@@ -11,11 +11,31 @@
 </head>
 <body>
 
+<div class="side-overlay" id="sideOverlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar" aria-label="Menu và bộ lọc sản phẩm">
+<div class="side-head">
+<span class="logo">PCKongKun</span>
+<button class="side-close" id="sideCloseBtn" onclick="closeSidebar()" aria-label="Đóng menu"><i class="fas fa-times"></i></button>
+</div>
+<div class="side-body">
+<nav class="side-nav">
+<button onclick="sideGoHome()"><i class="fas fa-house"></i> Trang chủ</button>
+<button onclick="sideShowAll()"><i class="fas fa-grid-2"></i> Tất cả sản phẩm</button>
+<a href="#contact" onclick="closeSidebar()"><i class="fas fa-envelope"></i> Liên hệ</a>
+</nav>
+<div class="side-filters" id="sideFilters"></div>
+</div>
+<div class="side-foot">
+<button class="btn-clear" onclick="clearAllFilters()">Xóa bộ lọc</button>
+<button class="btn-apply" onclick="closeSidebar()">Áp dụng bộ lọc</button>
+</div>
+</aside>
+
 <div class="topbar">Miễn phí vận chuyển cho đơn hàng từ 500K</div>
 
 <header class="site-header">
 <div class="header-inner">
-<button class="hamburger" onclick="toggleMobileNav(event)" title="Menu"><i class="fas fa-bars"></i></button>
+<button class="hamburger" onclick="openSidebar(event)" title="Menu"><i class="fas fa-bars"></i><span class="ham-badge" id="hamBadge" style="display:none">0</span></button>
 <a class="logo" href="#" onclick="goHome();return false;">PCKongKun</a>
 <nav class="main-nav">
 <a href="#" onclick="goHome();return false;">Trang chủ</a>
@@ -34,12 +54,6 @@
 <div class="search-bar" id="searchBar" style="display:none">
 <i class="fas fa-search"></i>
 <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm, hãng..." oninput="onSearch(this.value)">
-</div>
-<div class="mobile-nav" id="mobileNav">
-<a href="#" onclick="goHome();return false;">Trang chủ</a>
-<a href="#contact" onclick="closeMobileNav()">Liên hệ</a>
-<a href="admin.html">Quản trị</a>
-<div class="m-types" id="mTypes"></div>
 </div>
 </header>
 
@@ -130,19 +144,57 @@ function toggleNavTypes(e) {
   if (e) e.stopPropagation();
   document.getElementById('navTypes').classList.toggle('show');
 }
-function toggleMobileNav(e) {
+var sidebarOpen = false;
+var openAcc = null;
+var lastFocused = null;
+
+function openSidebar(e) {
   if (e) e.stopPropagation();
-  document.getElementById('mobileNav').classList.toggle('show');
+  lastFocused = (typeof document !== 'undefined' && document.activeElement) || null;
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sideOverlay').classList.add('show');
+  if (document.body && document.body.classList) document.body.classList.add('side-locked');
+  sidebarOpen = true;
+  buildSideFilters();
+  var btn = document.getElementById('sideCloseBtn');
+  if (btn && btn.focus) { try { btn.focus(); } catch (err) {} }
 }
-function closeMobileNav() {
-  var m = document.getElementById('mobileNav');
-  if (m) m.classList.remove('show');
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sideOverlay').classList.remove('show');
+  if (document.body && document.body.classList) document.body.classList.remove('side-locked');
+  sidebarOpen = false;
+  var target = (lastFocused && lastFocused.focus) ? lastFocused : null;
+  if (!target && document.querySelector) { try { target = document.querySelector('.hamburger'); } catch (err) {} }
+  if (target && target.focus) { try { target.focus(); } catch (err2) {} }
+}
+function sideGoHome() {
+  closeSidebar();
+  goHome();
+}
+function sideShowAll() {
+  currentType = 'all';
+  closeSidebar();
+  renderAll();
+  var g = document.getElementById('grid');
+  if (g && g.scrollIntoView) { try { g.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (err) {} }
 }
 document.addEventListener('click', function () {
   var n = document.getElementById('navTypes');
   if (n) n.classList.remove('show');
-  closeMobileNav();
   if (openDrop !== null) { openDrop = null; buildFilters(); }
+});
+document.addEventListener('keydown', function (e) {
+  if (!sidebarOpen) return;
+  if (e.key === 'Escape' || e.keyCode === 27) { closeSidebar(); return; }
+  if (e.key !== 'Tab') return;
+  var box = document.getElementById('sidebar');
+  if (!box || !box.querySelectorAll) return;
+  var f = box.querySelectorAll('button, a[href], input, select');
+  if (!f.length) return;
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 });
 function onSearch(v) { currentQuery = v.trim(); renderAll(); }
 
@@ -211,9 +263,11 @@ function onPick(radio) {
 function activeCount() {
   var n = F.prices.length;
   if (F.stock !== 'all') n += 1;
+  if (F.sort !== 'featured') n += 1;
+  if (currentType !== 'all') n += 1;
   return n;
 }
-function clearFilters() {
+function clearAllFilters() {
   F = { prices: [], stock: 'all', sort: 'featured' };
   renderAll();
 }
@@ -229,7 +283,7 @@ function buildFilters() {
   var priceOpts = PRICE_BRACKETS.map(function (b) {
     return checkRow('prices', b.id, b.label, F.prices.indexOf(b.id) !== -1);
   }).join('');
-  var html = '<button class="fbtn fclear" onclick="clearFilters()"><i class="fas fa-filter"></i> Bộ lọc' +
+  var html = '<button class="fbtn fclear" onclick="clearAllFilters()"><i class="fas fa-filter"></i> Bộ lọc' +
     (activeCount() ? ' <span class="fbadge">' + activeCount() + '</span>' : '') + '</button>' +
     fdrop('types', currentType === 'all' ? 'Loại sản phẩm' : getTypeName(currentType), typeOpts, currentType === 'all' ? '' : 1) +
     fdrop('prices', 'Giá', priceOpts, F.prices.length || '') +
@@ -243,8 +297,62 @@ function sortLabel() {
 }
 function pickType(t) {
   currentType = t;
-  closeMobileNav();
+  closeSidebar();
   renderAll();
+}
+
+// ---------- Sidebar accordions (reuse same filter state/handlers) ----------
+function accItem(id, icon, title, inner, badge) {
+  return '<div class="acc' + (openAcc === id ? ' open' : '') + '">' +
+    '<button class="acc-head" onclick="toggleAcc(\'' + id + '\')" aria-expanded="' + (openAcc === id) + '">' +
+    '<span><i class="fas ' + icon + '"></i> ' + esc(title) + '</span>' +
+    (badge ? '<span class="fbadge">' + badge + '</span>' : '') +
+    '<i class="fas fa-chevron-down acc-arrow"></i></button>' +
+    '<div class="acc-body"><div class="acc-inner">' + inner + '</div></div></div>';
+}
+function toggleAcc(id) {
+  openAcc = (openAcc === id) ? null : id;
+  buildSideFilters();
+}
+function sideRadios(field, opts, current) {
+  return opts.map(function (o) {
+    return '<label class="fcheck"><input type="radio" name="s-' + field + '" data-field="' + field + '" value="' + o.id + '"' +
+      (o.id === current ? ' checked' : '') + ' onchange="onPick(this)"><span></span>' + esc(o.label) + '</label>';
+  }).join('');
+}
+function buildSideFilters() {
+  var box = document.getElementById('sideFilters');
+  if (!box) return;
+  var types = distinctTypes(products);
+  var counts = {};
+  products.forEach(function (p) { counts[p.type] = (counts[p.type] || 0) + 1; });
+  var catLinks = '<button class="side-link' + (currentType === 'all' ? ' active' : '') + '" onclick="pickType(\'all\')">Tất cả sản phẩm <span>(' + products.length + ')</span></button>' +
+    types.map(function (t) {
+      return '<button class="side-link' + (t === currentType ? ' active' : '') + '" onclick="pickType(\'' + t + '\')">' +
+        esc(getTypeName(t)) + ' <span>(' + (counts[t] || 0) + ')</span></button>';
+    }).join('');
+  var typeRadios = '<label class="fcheck"><input type="radio" name="s-type" value="all"' +
+    (currentType === 'all' ? ' checked' : '') + ' onchange="pickType(this.value)"><span></span>Tất cả</label>' +
+    types.map(function (t) {
+      return '<label class="fcheck"><input type="radio" name="s-type" value="' + esc(t) + '"' +
+        (t === currentType ? ' checked' : '') + ' onchange="pickType(this.value)"><span></span>' + esc(getTypeName(t)) + '</label>';
+    }).join('');
+  var priceChecks = PRICE_BRACKETS.map(function (b) {
+    return checkRow('prices', b.id, b.label, F.prices.indexOf(b.id) !== -1);
+  }).join('');
+  box.innerHTML =
+    accItem('cats', 'fa-grid-2', 'Danh mục', catLinks, '') +
+    accItem('types', 'fa-tags', 'Loại sản phẩm', typeRadios, currentType === 'all' ? '' : 1) +
+    accItem('prices', 'fa-tag', 'Khoảng giá', priceChecks, F.prices.length || '') +
+    accItem('sort', 'fa-arrow-down-wide-short', 'Sắp xếp', sideRadios('sort', SORT_OPTS, F.sort), F.sort !== 'featured' ? 1 : '') +
+    accItem('stock', 'fa-boxes-stacked', 'Tình trạng sản phẩm', sideRadios('stock', STOCK_OPTS, F.stock), F.stock !== 'all' ? 1 : '');
+}
+function updateHamBadge() {
+  var b = document.getElementById('hamBadge');
+  if (!b) return;
+  var n = activeCount();
+  b.textContent = n;
+  b.style.display = n ? '' : 'none';
 }
 
 function cardHtml(p) {
@@ -290,6 +398,8 @@ function toast(msg) {
 function renderAll() {
   buildFilters();
   buildNavTypes();
+  buildSideFilters();
+  updateHamBadge();
   var list = applyFilters();
   var grid = document.getElementById('grid');
   grid.innerHTML = list.length
@@ -312,10 +422,6 @@ function buildNavTypes() {
   var foot = document.getElementById('footTypes');
   if (foot) foot.innerHTML = types.map(function (t) {
     return '<a href="#" onclick="pickType(\'' + t + '\');return false;">' + esc(getTypeName(t)) + '</a>';
-  }).join('');
-  var mob = document.getElementById('mTypes');
-  if (mob) mob.innerHTML = types.map(function (t) {
-    return '<button onclick="pickType(\'' + t + '\');closeMobileNav();">' + esc(getTypeName(t)) + '</button>';
   }).join('');
 }
 
