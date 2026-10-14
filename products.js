@@ -248,6 +248,15 @@ var CursorFX = (function () {
   var running = false, lastX = -9999, lastY = -9999, lastT = 0;
   var MAX = 130;
   var nextMeteor = -1;
+  var diagReason = 'not-run';
+
+  function fxForced() {
+    try {
+      if (typeof window !== 'undefined' && window.location && window.location.search &&
+          window.location.search.indexOf('fx=1') !== -1) return true;
+    } catch (e) {}
+    return false;
+  }
   var COLORS_LIGHT = ['#ff8c42', '#ff6b4a', '#e05b3a', '#ffb03a'];
   var COLORS_DARK = ['#ffd97a', '#ffb37e', '#fff3d6', '#ff9d7e'];
 
@@ -260,14 +269,17 @@ var CursorFX = (function () {
   }
 
   function canInit() {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return false;
-    if (!window.requestAnimationFrame) return false;
-    try {
-      if (window.matchMedia) {
-        if (window.matchMedia('(pointer: coarse)').matches) return false;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-      }
-    } catch (e) {}
+    if (typeof window === 'undefined' || typeof document === 'undefined') { diagReason = 'no-dom'; return false; }
+    if (!window.requestAnimationFrame) { diagReason = 'no-raf'; return false; }
+    if (!fxForced()) {
+      try {
+        if (window.matchMedia) {
+          if (window.matchMedia('(pointer: coarse)').matches) { diagReason = 'coarse-pointer'; return false; }
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { diagReason = 'reduced-motion'; return false; }
+        }
+      } catch (e) {}
+    }
+    diagReason = 'ok';
     return true;
   }
 
@@ -411,7 +423,9 @@ var CursorFX = (function () {
     return true;
   }
 
-  return { init: init, burst: burst, _count: function () { return parts.length; } };
+  return { init: init, burst: burst,
+    _count: function () { return parts.length; },
+    _reason: function () { return diagReason; } };
 })();
 
 function starBurst() {
@@ -421,8 +435,18 @@ function starBurst() {
 try {
   if (typeof window !== 'undefined') {
     window.__cursorState = function () {
-      return { hasCanvas: !!(typeof document !== 'undefined' && document.getElementById && document.getElementById('cursor-fx')),
-        parts: CursorFX._count() };
+      var out = { hasCanvas: false, parts: 0, reason: 'unknown' };
+      try {
+        out.reason = CursorFX._reason();
+        out.parts = CursorFX._count();
+        out.hasCanvas = !!(typeof document !== 'undefined' && document.getElementById && document.getElementById('cursor-fx'));
+        if (window.matchMedia) {
+          out.coarse = !!window.matchMedia('(pointer: coarse)').matches;
+          out.reducedMotion = !!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          out.hasRaf = !!window.requestAnimationFrame;
+        }
+      } catch (e) { out.error = String(e); }
+      return out;
     };
   }
 } catch (e) {}
