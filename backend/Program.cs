@@ -24,6 +24,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors();
+app.UseStaticFiles(); // serves wwwroot/uploads/*.jpg ...
 app.MapControllers();
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok", time = DateTime.UtcNow }));
 

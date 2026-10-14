@@ -620,6 +620,39 @@ h1, h2, h3, .logo, .hero-text h1 {
 .check-line input { width: 18px !important; height: 18px; accent-color: var(--rose-dark); cursor: pointer; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
+/* ===== Image dropzone (admin) ===== */
+.dropzone {
+  border: 2px dashed #d9c6ae;
+  border-radius: 14px;
+  padding: 26px 16px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.2s;
+  background: #fff;
+}
+.dropzone i { font-size: 1.8rem; color: var(--rose); margin-bottom: 8px; }
+.dropzone p { font-size: 0.85rem; margin: 0 !important; }
+.dropzone:hover, .dropzone.over { border-color: var(--rose-dark); background: #faf4ea; }
+.preview-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+}
+.preview-row img {
+  width: 76px; height: 76px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.preview-info p { margin: 0 0 6px !important; font-size: 0.82rem !important; }
+.preview-info .btn { padding: 6px 12px; font-size: 0.78rem; }
+
 @media (max-width: 900px) {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .hero { grid-template-columns: 1fr; padding-top: 36px; }

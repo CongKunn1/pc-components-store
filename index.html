@@ -84,7 +84,7 @@ var products = [];
 var currentType = 'all';
 var currentQuery = '';
 var openDrop = null;
-var F = { prices: [], brands: [], stock: 'all', sort: 'featured' };
+var F = { prices: [], stock: 'all', sort: 'featured' };
 
 var SORT_OPTS = [
   { id: 'featured', label: 'Nổi bật' },
@@ -107,7 +107,7 @@ function money(n) { return Number(n || 0).toLocaleString('vi-VN') + ' VNĐ'; }
 function goHome() {
   currentType = 'all'; currentQuery = '';
   document.getElementById('searchInput').value = '';
-  F = { prices: [], brands: [], stock: 'all', sort: 'featured' };
+  F = { prices: [], stock: 'all', sort: 'featured' };
   renderAll();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -148,7 +148,6 @@ function applyFilters() {
   var list = products.filter(function (p) {
     if (currentType !== 'all' && p.type !== currentType) return false;
     if (!matchBracket(p, F.prices)) return false;
-    if (F.brands.length && F.brands.indexOf(String(p.brand || '').toLowerCase()) === -1) return false;
     if (F.stock === 'in' && !inStock(p)) return false;
     if (F.stock === 'out' && inStock(p)) return false;
     return matchQuery(p);
@@ -192,12 +191,12 @@ function onPick(radio) {
   renderAll();
 }
 function activeCount() {
-  var n = F.prices.length + F.brands.length;
+  var n = F.prices.length;
   if (F.stock !== 'all') n += 1;
   return n;
 }
 function clearFilters() {
-  F = { prices: [], brands: [], stock: 'all', sort: 'featured' };
+  F = { prices: [], stock: 'all', sort: 'featured' };
   renderAll();
 }
 
@@ -212,15 +211,10 @@ function buildFilters() {
   var priceOpts = PRICE_BRACKETS.map(function (b) {
     return checkRow('prices', b.id, b.label, F.prices.indexOf(b.id) !== -1);
   }).join('');
-  var brandOpts = distinctValues(products, 'brand').map(function (v) {
-    var k = String(v).toLowerCase();
-    return checkRow('brands', k, getBrandName(v), F.brands.indexOf(k) !== -1);
-  }).join('') || '<p class="fempty">Chưa có dữ liệu</p>';
   var html = '<button class="fbtn fclear" onclick="clearFilters()"><i class="fas fa-filter"></i> Bộ lọc' +
     (activeCount() ? ' <span class="fbadge">' + activeCount() + '</span>' : '') + '</button>' +
     fdrop('types', currentType === 'all' ? 'Loại sản phẩm' : getTypeName(currentType), typeOpts, currentType === 'all' ? '' : 1) +
     fdrop('prices', 'Giá', priceOpts, F.prices.length || '') +
-    fdrop('brands', 'Hãng', brandOpts, F.brands.length || '') +
     fdrop('sort', 'Sắp xếp: ' + sortLabel(), radioRow('sort', SORT_OPTS, F.sort), '') +
     fdrop('stock', 'Tình trạng', radioRow('stock', STOCK_OPTS, F.stock), F.stock !== 'all' ? 1 : '');
   document.getElementById('filterRow').innerHTML = html;
@@ -241,8 +235,9 @@ function cardHtml(p) {
   if (pct > 0) badges += '<span class="badge sale">-' + pct + '%</span>';
   else if ((p.rating || 0) >= 4.8) badges += '<span class="badge hot">Bán chạy</span>';
   if (!stocked) badges += '<span class="badge out">Hết hàng</span>';
-  var img = p.imageUrl
-    ? '<img src="' + p.imageUrl + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.remove()">'
+  var src = imgSrc(p.imageUrl);
+  var img = src
+    ? '<img src="' + src + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.remove()">'
     : '<span class="img-fallback"><i class="fas fa-box-open"></i></span>';
   var price = pct > 0
     ? '<div class="price"><b>' + money(effPrice(p)) + '</b><s>' + money(p.price) + '</s></div>'
@@ -252,7 +247,7 @@ function cardHtml(p) {
     '<div class="card-body"><h3>' + esc(p.name) + '</h3>' +
     (p.title ? '<p class="card-sub">' + esc(p.title) + '</p>' : '') +
     price +
-    '<p class="card-rate"><i class="fas fa-star"></i> ' + (p.rating || '–') + ' • ' + esc(getBrandName(p.brand)) + '</p>' +
+    '<p class="card-rate"><i class="fas fa-star"></i> ' + (p.rating || '–') + '</p>' +
     '</div></article>';
 }
 

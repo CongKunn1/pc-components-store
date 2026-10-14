@@ -60,6 +60,16 @@ function inStock(p) {
   return p.inStock !== false;
 }
 
+// Resolve a product image URL for display:
+// - http(s)/data URLs are used as-is
+// - "/uploads/x.jpg" from the API is resolved against the API base
+function imgSrc(url) {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url) || url.indexOf('data:') === 0) return url;
+  if (url.charAt(0) === '/') return apiBase() + url;
+  return url;
+}
+
 // Price brackets for the collection filter bar (VND).
 var PRICE_BRACKETS = [
   { id: 'p1', label: 'Dưới 5 triệu', min: 0, max: 5000000 },
